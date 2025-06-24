@@ -6,6 +6,15 @@ const bot = new TelegramBot("8043984408:AAGJxqVdQv67fTDKobKE1axIMrtG6grDYVM", {
   polling: true,
 });
 
+// Error handling
+bot.on('polling_error', (error) => {
+  console.log('Polling error:', error.message);
+});
+
+bot.on('error', (error) => {
+  console.log('Bot error:', error.message);
+});
+
 // Guruhga yuborish uchun chat ID (manfiy son)
 const adminChatId = -4972889819;
 
@@ -89,8 +98,8 @@ bot.on("callback_query", (query) => {
     case "admin":
       bot.sendMessage(
         chatId,
-        url: "https://t.me/KXNexsus",
         "Admin Bilan Bog'lanish: https://t.me/KXNexsus \n Reklama olmaymiz, faqatgina savol va takliflaringizni yozing.\n Botni yaxshilash uchun sizning fikringiz biz uchun muhim 😊 <a href='https://t.me/m_kimynazarov'>2 - adminga zoying</a>",
+        { parse_mode: "HTML" }
       );
       break;
   }
@@ -101,6 +110,9 @@ bot.on("message", (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
+  // Komandalarni ignore qilish
+  if (text && text.startsWith('/')) return;
+  
   if (!userState[chatId]) return;
   const step = userState[chatId].step;
 
