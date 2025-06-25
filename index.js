@@ -3,7 +3,25 @@ const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 
 const bot = new TelegramBot("8043984408:AAGJxqVdQv67fTDKobKE1axIMrtG6grDYVM", {
-  polling: true,
+  polling: {
+    interval: 300,
+    autoStart: true,
+    params: {
+      timeout: 10,
+    },
+  },
+});
+
+// Handle polling errors
+bot.on("polling_error", (error) => {
+  console.log("Polling error:", error.message);
+});
+
+// Delete webhook if exists to avoid conflicts
+bot.deleteWebHook().then(() => {
+  console.log("Webhook deleted successfully");
+}).catch((err) => {
+  console.log("No webhook to delete or error:", err.message);
 });
 const adminChatId = -4972889819;
 const userState = {};
@@ -48,12 +66,21 @@ function sendMainMenu(chatId) {
   );
 }
 
-bot.onText(/\/menyu/, {
-  reply_markup: {
+bot.onText(/\/menyu/, (msg) => {
+  const chatId = msg.chat.id;
+  sendMainMenu(chatId);
+});
 
-      remove_keyboard: false
-
-  }
+bot.onText(/\/help/, (msg) => {
+  const chatId = msg.chat.id;
+  bot.sendMessage(chatId, 
+    "🤖 <b>Yordam</b>\n\n" +
+    "/start - Botni ishga tushirish\n" +
+    "/menyu - Asosiy menyuni ochish\n" +
+    "/help - Ushbu yordam xabarini ko'rsatish\n\n" +
+    "Savollar uchun: @KXNexsus", 
+    { parse_mode: "HTML" }
+  );
 });
 
 bot.onText(/\/start/, async (msg) => {
