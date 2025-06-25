@@ -7,3 +7,9 @@
 2025-06-25 08:05:00 - Bot started successfully
 2025-06-25 08:05:00 - Server started on port 3000
 2025-06-25 08:05:00 - Bot started successfully
+2025-06-25 08:11:00 - Bot started successfully
+2025-06-25 08:11:00 - Server started on port 5000
+2025-06-25 08:14:18 - Bot started successfully
+2025-06-25 08:14:18 - Server started on port 5000
+2025-06-25 08:18:02 - Bot started successfully
+2025-06-25 08:18:02 - Server started on port 5000
