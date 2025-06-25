@@ -5,6 +5,7 @@ const moment = require("moment");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const sanitizeHtml = require("sanitize-html");
 
 // Bot Configuration
 const bot = new TelegramBot("8043984408:AAGJxqVdQv67fTDKobKE1axIMrtG6grDYVM", {
@@ -60,6 +61,9 @@ function sendAnimatedMessage(chatId, text, options = {}) {
   const loadingSteps = ["⏳", "🔄", "✨", "🎯"];
   let currentStep = 0;
   
+  // Sanitize the text before sending
+  const sanitizedText = options.parse_mode === "HTML" ? sanitizeMessage(text) : text;
+  
   return bot.sendMessage(chatId, loadingText, options).then(sentMessage => {
     const interval = setInterval(() => {
       currentStep = (currentStep + 1) % loadingSteps.length;
@@ -72,12 +76,12 @@ function sendAnimatedMessage(chatId, text, options = {}) {
     
     setTimeout(() => {
       clearInterval(interval);
-      bot.editMessageText(text, {
+      bot.editMessageText(sanitizedText, {
         chat_id: chatId,
         message_id: sentMessage.message_id,
         ...options
       }).catch(() => {
-        bot.sendMessage(chatId, text, options);
+        bot.sendMessage(chatId, sanitizedText, options);
       });
     }, 1200);
     
@@ -88,6 +92,18 @@ function sendAnimatedMessage(chatId, text, options = {}) {
 // Utility Functions
 function escapeMarkdown(text) {
   return text.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, "\\$1");
+}
+
+function sanitizeMessage(text) {
+  return sanitizeHtml(text, {
+    allowedTags: ['b', 'i', 'u', 's', 'code', 'pre', 'a'],
+    allowedAttributes: {
+      'a': ['href']
+    },
+    textFilter: function(text) {
+      return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  });
 }
 
 function logToFile(content) {
