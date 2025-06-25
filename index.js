@@ -20,10 +20,11 @@ const bot = new TelegramBot("8043984408:AAGJxqVdQv67fTDKobKE1axIMrtG6grDYVM", {
 
 // Express Server Configuration
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // Bot Settings
 const adminChatId = -4972889819;
+const publicChatId = -4972889819; // Ommaviy chat ID
 const channelUsername = "@hayoti_tajribam";
 const userState = {};
 const userStats = {};
@@ -154,6 +155,29 @@ function updateUserStats(userId) {
 function isAdmin(userId) {
   const adminIds = [adminChatId, 123456789];
   return adminIds.includes(userId);
+}
+
+function isPublicChat(chatId) {
+  return chatId === publicChatId;
+}
+
+function getPublicChatWelcome(firstName) {
+  return `🎉 <b>Assalomu alaykum, ${firstName}!</b>
+
+🌟 <i>Professional IT Solutions ga xush kelibsiz!</i>
+
+💼 <b>Bizning xizmatlar:</b>
+• 🌐 Web-sayt yaratish va dizayni
+• 🤖 Telegram bot dasturlash
+• 🔑 Domen va hosting xizmati
+• 📱 Mobil ilovalar yaratish
+• 🧤 Innovatsion IT loyihalar
+
+📞 <b>Buyurtma berish:</b> Botga shaxsiy xabar yuboring
+👨‍💻 <b>Mutahassis:</b> @KXNexsus
+📺 <b>Kanal:</b> ${channelUsername}
+
+💡 <i>Sifatli xizmat va professional yondashuv!</i>`;
 }
 
 // Main Menu Function
@@ -393,8 +417,23 @@ bot.onText(/\/start/, async (msg) => {
     return bot.sendMessage(chatId, "🚫 Siz botdan foydalanish uchun ban qilingansiz.");
   }
 
-  userState[chatId] = { step: 0, serviceType: null };
   updateUserStats(userId);
+
+  // Ommaviy chatda boshqacha muomala
+  if (isPublicChat(chatId)) {
+    const publicWelcome = getPublicChatWelcome(msg.from.first_name);
+    return sendAnimatedMessage(chatId, publicWelcome, { 
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: [[
+          { text: "🤖 Botga shaxsiy xabar", url: `https://t.me/${process.env.BOT_USERNAME || 'KXNexsusBot'}` },
+          { text: "📺 Kanalga obuna", url: `https://t.me/${channelUsername.replace("@", "")}` }
+        ]]
+      }
+    });
+  }
+
+  userState[chatId] = { step: 0, serviceType: null };
 
   try {
     const res = await bot.getChatMember(channelUsername, userId);
@@ -503,6 +542,26 @@ bot.on("message", async (msg) => {
   }
 
   updateUserStats(userId);
+
+  // Ommaviy chatda faqat muhim buyruqlarga javob berish
+  if (isPublicChat(chatId)) {
+    // Faqat muayyan kalit so'zlarga javob berish
+    const keywords = ['bot', 'sayt', 'dasturlash', 'xizmat', 'narx', 'buyurtma', 'loyiha'];
+    const hasKeyword = keywords.some(keyword => text.toLowerCase().includes(keyword));
+    
+    if (hasKeyword || text.includes('@')) {
+      return bot.sendMessage(chatId, `📞 <b>Buyurtma berish uchun:</b>
+
+🤖 Botga shaxsiy xabar yuboring: @KXNexsusBot
+👨‍💻 Yoki to'g'ridan-to'g'ri: @KXNexsus
+
+💡 <i>Shaxsiy chatda barcha xizmatlar mavjud!</i>`, {
+        parse_mode: "HTML",
+        reply_to_message_id: msg.message_id
+      });
+    }
+    return; // Ommaviy chatda boshqa xabarlarga javob bermaslik
+  }
 
   // Handle subscription check
   if (text === "✅ Obuna bo'ldim, tekshirish") {
