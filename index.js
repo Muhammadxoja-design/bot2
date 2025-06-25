@@ -11,6 +11,26 @@ function escapeMarkdown(text) {
   return text.replace(/([_*[\]()~`>#+\-=|{}.!])/g, "\\$1");
 }
 
+function sendMainMenu(chatId) {
+  bot.sendMessage(
+    chatId,
+    "🏠 <b>Bosh menyu</b>\n\nQuyidagi xizmatlardan birini tanlang:",
+    {
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "🌐 Web-sayt", callback_data: "website" }],
+          [{ text: "🔑 Domen & Hosting", callback_data: "domain_hosting" }],
+          [{ text: "🤖 Bot xizmatlari", callback_data: "bot" }],
+          [{ text: "📦 Buyurtma berish", callback_data: "deflaut_buyurtma" }],
+          [{ text: "🧤 Innovatsion buyum", callback_data: "buyum" }],
+          [{ text: "👨‍💼 Admin", callback_data: "admin" }],
+        ],
+      },
+    },
+  );
+}
+
 // === /start ===
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
@@ -272,7 +292,7 @@ bot.on("message", (msg) => {
 🆔 ID: ${user.id}
 👨‍💼 Ismi: ${state.name}
 📞 Tel: ${state.phone}
-🛠 Xizmat: ${serviceType}
+🛠 Xizmat: ${service}
 📝 Izoh: ${state.comment}`;
 
       bot.sendMessage(
