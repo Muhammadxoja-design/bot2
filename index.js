@@ -34,33 +34,26 @@ const bannedUsers = new Set();
 // Service Prices (in UZS)
 const servicePrices = {
   "🌐 Web-sayt": {
-    "0 dan sayt": 2000000,
-    "Template dan sayt": 1500000,
-    "Saytni yangilash": 500000,
-    "Landing page": 800000,
-    "E-commerce sayt": 3000000
+    "0 dan sayt": '100 000 - 1 000 000',
+    "Template dan sayt": '50 000 - 300 000',
+    "Saytni yangilash": '50 000 - 600 000',
+    "Landing page": ' 50 000 - 200 000 ',
+    "E-commerce sayt": '100 000 - 1 500 000'
   },
   "🔑 Domen & Hosting": {
-    "Domen (.com)": 150000,
-    "Domen (.uz)": 100000,
-    "Hosting (yillik)": 300000,
-    "SSL sertifikat": 200000,
-    "Backup xizmati": 250000
+    "Domen (.com)": '150 000',
+    "Domen (.uz)": '150 000',
+    "Hosting (yillik)": '400 000',
+    "SSL sertifikat": '200 000',
+    "Backup xizmati": '250 000'
   },
   "🤖 Bot xizmatlari": {
-    "Oddiy bot": 800000,
-    "E-commerce bot": 1500000,
-    "CRM bot": 2000000,
-    "Inline bot": 1200000,
-    "Payment bot": 2500000
+    "Oddiy bot": 'Chegirmada 80 0000',
+    "E-commerce bot": 'Chegirmada 200 000',
+    "CRM bot": '200 000',
+    "Inline bot": '120 000',
+    "Payment bot": '250 000'
   },
-  "🧤 Innovatsion buyum": {
-    "Mobile app": 5000000,
-    "Desktop app": 4000000,
-    "API integration": 1000000,
-    "Database design": 800000,
-    "System optimization": 600000
-  }
 };
 
 // Bot Commands
@@ -88,7 +81,7 @@ function logToFile(content) {
   fs.appendFileSync(filePath, `${timestamp} - ${content}${os.EOL}`);
 }
 
-function saveOrderToFile(order) {
+function saverderToFile(order) {
   const filePath = path.join(__dirname, "orders.json");
   let orders = [];
   
@@ -208,16 +201,16 @@ function sendBotMenu(chatId) {
 }
 
 function sendInnovationMenu(chatId) {
-  bot.sendMessage(chatId, "🧤 <b>Innovatsion buyumlar</b>\n\nQanday dastur kerak?", {
+  bot.sendMessage(chatId, "🧤 <b>Biz Yasayotgan Qolqop</b>\n\nAniqroq Malumotlar:", {
     parse_mode: "HTML",
     reply_markup: {
-      inline_keyboard: [
-        [{ text: "📱 Mobile app", callback_data: "Innovation_mobile" }],
-        [{ text: "💻 Desktop app", callback_data: "Innovation_desktop" }],
-        [{ text: "🔗 API integration", callback_data: "Innovation_api" }],
-        [{ text: "🗃 Database design", callback_data: "Innovation_database" }],
-        [{ text: "⚡ System optimization", callback_data: "Innovation_optimization" }],
-        [{ text: "🔙 Ortga", callback_data: "back_main" }],
+      keyboard: [
+        ['Qolqop Haqida Malumot', 'Qolqopni Qanday Yasaymiz'],
+        ['Nimaga Yasamoqchimiz', 'Donat qilish'],
+        [{
+          text: 'qolqop vedio',
+          web_app: 'https://'
+        }]
       ],
     },
   });
@@ -667,7 +660,7 @@ bot.on("message", async (msg) => {
 
       // Save order
       orderHistory.push(orderData);
-      saveOrderToFile(orderData);
+      saveOrderToFi  le(orderData);
       
       // Update user stats
       if (userStats[userId]) {
