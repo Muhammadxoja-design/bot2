@@ -38,21 +38,24 @@ const servicePrices = {
     "Template dan sayt": '50,000 - 300,000 so\'m',
     "Saytni yangilash": '50,000 - 600,000 so\'m',
     "Landing page": '50,000 - 200,000 so\'m',
-    "E-commerce sayt": '100,000 - 1,500,000 so\'m'
+    "E-commerce sayt": '100,000 - 1,500,000 so\'m',
+    "Admin": 'https://t.me/m_kimyonazarov'
   },
   "🔑 Domen & Hosting": {
     "Domen (.com)": '150,000 so\'m',
     "Domen (.uz)": '150,000 so\'m',
     "Hosting (yillik)": '400,000 so\'m',
     "SSL sertifikat": '200,000 so\'m',
-    "Backup xizmati": '250,000 so\'m'
+    "Backup xizmati": '250,000 so\'m',
+    "Admin": 'https://t.me/m_kimyonazarov'
   },
   "🤖 Bot xizmatlari": {
     "Oddiy bot": '80,000 so\'m (chegirmada)',
     "E-commerce bot": '200,000 so\'m (chegirmada)',
     "CRM bot": '200,000 so\'m',
     "Inline bot": '120,000 so\'m',
-    "Payment bot": '250,000 so\'m'
+    "Payment bot": '250,000 so\'m',
+    "Admin": 'https://t.me/m_kimyonazarov'
   },
 };
 
@@ -153,7 +156,7 @@ function updateUserStats(userId) {
 }
 
 function isAdmin(userId) {
-  const adminIds = [adminChatId, 123456789];
+  const adminIds = [adminChatId, 6813216374];
   return adminIds.includes(userId);
 }
 
@@ -174,8 +177,9 @@ function getPublicChatWelcome(firstName) {
 • 🧤 Innovatsion IT loyihalar
 
 📞 <b>Buyurtma berish:</b> Botga shaxsiy xabar yuboring
-👨‍💻 <b>Mutahassis:</b> @KXNexsus
+👨‍💻 <b>Mutahassis:</b> <a href="https://t.me/KXNexsus">KX Nexsus</a>
 📺 <b>Kanal:</b> ${channelUsername}
+🤖 <b>Botni yaxshilash haqidagi fikiringgizni <a href="https://t.me/m_kimyonazarov">Muhammadxojaga</a> yozing. Sizning fikiringgiz biz uchun muhum! </b>
 
 💡 <i>Sifatli xizmat va professional yondashuv!</i>`;
 }
@@ -318,7 +322,10 @@ function sendStatistics(chatId) {
 // Admin Functions
 function sendAdminPanel(chatId, userId) {
   if (!isAdmin(userId)) {
-    return bot.sendMessage(chatId, "❌ Sizda admin huquqlari yo'q!");
+    return bot.sendMessage(chatId, `❌ Sizda admin huquqlari yo'q!\n
+    admin: @KXNexsus\n
+    admin: @m_kimyonazarov\n
+    `);
   }
 
   const text = `👨‍💼 <b>Admin Panel</b>
@@ -369,14 +376,14 @@ function sendContactInfo(chatId) {
 
 🎯 <i>Har doim aloqada</i>
 
-👨‍💻 <b>Dasturchi:</b> @KXNexsus
-📧 <b>Email:</b> info@kxnexsus.uz
-📱 <b>Telefon:</b> +998 90 123 45 67
+👨‍💻 <b>Dasturchi:</b> @m_kimyonazarov
+📧 <b>Email:</b> coderkimyonazarov@gmail.com
+📱 <b>Telefon:</b> +998 77 404 13 56
 🌐 <b>Website:</b> https://kxnexsus.uz
 📺 <b>Kanal:</b> ${channelUsername}
 
 ⏰ <b>Ish vaqti:</b> 09:00 - 18:00 (Dushanba-Juma)
-📍 <b>Manzil:</b> Toshkent, Uzbekiston
+📍 <b>Manzil:</b> Farg'ona, Oltiariq
 
 💬 <i>Savollaringiz uchun doimo tayyormiz!</i>`;
 
