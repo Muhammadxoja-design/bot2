@@ -265,8 +265,8 @@ bot.on("message", (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
-  // Skip commands
-  if (text.startsWith("/")) return;
+  // Skip non-text messages and commands
+  if (!text || text.startsWith("/")) return;
 
   // Handle main menu keyboard buttons
   if (!userState[chatId] || userState[chatId].step === 0) {
@@ -455,7 +455,12 @@ bot.on("message", (msg) => {
       });
       break;
     case 2:
-      state.phone = text;
+      // Handle contact sharing
+      if (msg.contact) {
+        state.phone = msg.contact.phone_number;
+      } else {
+        state.phone = text;
+      }
       state.step = 3;
       bot.sendMessage(
         chatId,
