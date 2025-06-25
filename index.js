@@ -1,12 +1,10 @@
 
-// ✅ Telegram Bot + Express Server | Full Version 700+ Lines
 const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 const moment = require("moment");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const axios = require("axios");
 
 // Bot Configuration
 const bot = new TelegramBot("8043984408:AAGJxqVdQv67fTDKobKE1axIMrtG6grDYVM", {
@@ -34,41 +32,58 @@ const bannedUsers = new Set();
 // Service Prices (in UZS)
 const servicePrices = {
   "🌐 Web-sayt": {
-    "0 dan sayt": '100 000 - 1 000 000',
-    "Template dan sayt": '50 000 - 300 000',
-    "Saytni yangilash": '50 000 - 600 000',
-    "Landing page": ' 50 000 - 200 000 ',
-    "E-commerce sayt": '100 000 - 1 500 000'
+    "0 dan sayt": '100,000 - 1,000,000 so\'m',
+    "Template dan sayt": '50,000 - 300,000 so\'m',
+    "Saytni yangilash": '50,000 - 600,000 so\'m',
+    "Landing page": '50,000 - 200,000 so\'m',
+    "E-commerce sayt": '100,000 - 1,500,000 so\'m'
   },
   "🔑 Domen & Hosting": {
-    "Domen (.com)": '150 000',
-    "Domen (.uz)": '150 000',
-    "Hosting (yillik)": '400 000',
-    "SSL sertifikat": '200 000',
-    "Backup xizmati": '250 000'
+    "Domen (.com)": '150,000 so\'m',
+    "Domen (.uz)": '150,000 so\'m',
+    "Hosting (yillik)": '400,000 so\'m',
+    "SSL sertifikat": '200,000 so\'m',
+    "Backup xizmati": '250,000 so\'m'
   },
   "🤖 Bot xizmatlari": {
-    "Oddiy bot": 'Chegirmada 80 0000',
-    "E-commerce bot": 'Chegirmada 200 000',
-    "CRM bot": '200 000',
-    "Inline bot": '120 000',
-    "Payment bot": '250 000'
+    "Oddiy bot": '80,000 so\'m (chegirmada)',
+    "E-commerce bot": '200,000 so\'m (chegirmada)',
+    "CRM bot": '200,000 so\'m',
+    "Inline bot": '120,000 so\'m',
+    "Payment bot": '250,000 so\'m'
   },
 };
 
-// Bot Commands
-const commands = [
-  { command: "start", description: "Botni Ishga Tushurish" },
-  { command: "menyu", description: "Asosiy menyuni ochish" },
-  { command: "help", description: "Yordam olish" },
-  { command: "status", description: "Bot holati haqida" },
-  { command: "info", description: "Foydalanuvchi ma'lumoti" },
-  { command: "narxlar", description: "Xizmat narxlari" },
-  { command: "contact", description: "Bog'lanish ma'lumotlari" },
-  { command: "admin", description: "Admin panel (faqat adminlar uchun)" }
-];
-
-bot.setMyCommands(commands);
+// Animation helper function
+function sendAnimatedMessage(chatId, text, options = {}) {
+  const loadingText = "⏳ Yuklanmoqda";
+  const loadingSteps = ["⏳", "🔄", "✨", "🎯"];
+  let currentStep = 0;
+  
+  return bot.sendMessage(chatId, loadingText, options).then(sentMessage => {
+    const interval = setInterval(() => {
+      currentStep = (currentStep + 1) % loadingSteps.length;
+      bot.editMessageText(`${loadingSteps[currentStep]} Yuklanmoqda...`, {
+        chat_id: chatId,
+        message_id: sentMessage.message_id,
+        ...options
+      }).catch(() => {});
+    }, 300);
+    
+    setTimeout(() => {
+      clearInterval(interval);
+      bot.editMessageText(text, {
+        chat_id: chatId,
+        message_id: sentMessage.message_id,
+        ...options
+      }).catch(() => {
+        bot.sendMessage(chatId, text, options);
+      });
+    }, 1200);
+    
+    return sentMessage;
+  });
+}
 
 // Utility Functions
 function escapeMarkdown(text) {
@@ -81,7 +96,7 @@ function logToFile(content) {
   fs.appendFileSync(filePath, `${timestamp} - ${content}${os.EOL}`);
 }
 
-function saverderToFile(order) {
+function saveOrderToFile(order) {
   const filePath = path.join(__dirname, "orders.json");
   let orders = [];
   
@@ -121,97 +136,121 @@ function updateUserStats(userId) {
 }
 
 function isAdmin(userId) {
-  const adminIds = [adminChatId, 123456789]; // Add more admin IDs here
+  const adminIds = [adminChatId, 123456789];
   return adminIds.includes(userId);
-}
-
-function formatPrice(price) {
-  return new Intl.NumberFormat("uz-UZ").format(price) + " so'm";
 }
 
 // Main Menu Function
 function sendMainMenu(chatId) {
-  bot.sendMessage(
-    chatId,
-    "🏠 <b>Bosh menyu</b>\n\nQuyidagi xizmatlardan birini tanlang:",
-    {
-      parse_mode: "HTML",
-      reply_markup: {
-        keyboard: [
-          ["🌐 Web-sayt", "🔑 Domen & Hosting"],
-          ["🤖 Bot xizmatlari", "📦 Buyurtma berish"],
-          ["🧤 Innovatsion buyum", "💰 Narxlar"],
-          ["👨‍💼 Admin", "📊 Statistika"],
-          ["🗃 Ma'lumotlar", "📞 Bog'lanish"],
-          ["❌ Menyuni yopish"],
-        ],
-        resize_keyboard: true,
-      },
+  const welcomeText = `🏠 <b>Bosh menyu</b>
+
+🌟 <i>Professional IT xizmatlar markazi</i>
+
+📋 Quyidagi xizmatlardan birini tanlang:`;
+
+  sendAnimatedMessage(chatId, welcomeText, {
+    parse_mode: "HTML",
+    reply_markup: {
+      keyboard: [
+        ["🌐 Web-sayt", "🔑 Domen & Hosting"],
+        ["🤖 Bot xizmatlari", "🧤 Innovatsion loyiha"],
+        ["📦 Buyurtma berish", "💰 Narxlar"],
+        ["📊 Statistika", "📞 Bog'lanish"],
+        ["👨‍💼 Admin panel", "ℹ️ Ma'lumotlar"],
+        ["❌ Menyuni yopish"]
+      ],
+      resize_keyboard: true,
+      one_time_keyboard: false
     },
-  );
+  });
 }
 
 // Service Menus
 function sendWebsiteMenu(chatId) {
-  bot.sendMessage(chatId, "🌐 <b>Web-sayt xizmatlari</b>\n\nQanday sayt kerak?", {
+  const text = `🌐 <b>Web-sayt xizmatlari</b>
+
+🚀 <i>Zamonaviy va professional saytlar</i>
+
+🎯 Qanday sayt kerak?`;
+
+  sendAnimatedMessage(chatId, text, {
     parse_mode: "HTML",
     reply_markup: {
-      inline_keyboard: [
-        [{ text: "🆕 0 dan sayt", callback_data: "order_0dan" }],
-        [{ text: "📋 Template dan sayt", callback_data: "order_clone" }],
-        [{ text: "🔄 Saytni yangilash", callback_data: "order_update" }],
-        [{ text: "📄 Landing page", callback_data: "order_landing" }],
-        [{ text: "🛒 E-commerce sayt", callback_data: "order_ecommerce" }],
-        [{ text: "🔙 Ortga", callback_data: "back_main" }],
+      keyboard: [
+        ["🆕 0 dan sayt", "📋 Template dan sayt"],
+        ["🔄 Saytni yangilash", "📄 Landing page"],
+        ["🛒 E-commerce sayt"],
+        ["🔙 Bosh menyuga qaytish"]
       ],
+      resize_keyboard: true,
     },
   });
 }
 
 function sendDomainMenu(chatId) {
-  bot.sendMessage(chatId, "🔑 <b>Domen & Hosting xizmatlari</b>\n\nNima kerak?", {
+  const text = `🔑 <b>Domen & Hosting xizmatlari</b>
+
+🌐 <i>Ishonchli va tezkor hosting</i>
+
+⚡ Nima kerak?`;
+
+  sendAnimatedMessage(chatId, text, {
     parse_mode: "HTML",
     reply_markup: {
-      inline_keyboard: [
-        [{ text: "🌐 Domen (.com)", callback_data: "Domain_com" }],
-        [{ text: "🇺🇿 Domen (.uz)", callback_data: "Domain_uz" }],
-        [{ text: "💾 Hosting", callback_data: "Domain_hosting" }],
-        [{ text: "🔒 SSL sertifikat", callback_data: "Domain_ssl" }],
-        [{ text: "💿 Backup", callback_data: "Domain_backup" }],
-        [{ text: "🔙 Ortga", callback_data: "back_main" }],
+      keyboard: [
+        ["🌐 Domen (.com)", "🇺🇿 Domen (.uz)"],
+        ["💾 Hosting xizmati", "🔒 SSL sertifikat"],
+        ["💿 Backup xizmati"],
+        ["🔙 Bosh menyuga qaytish"]
       ],
+      resize_keyboard: true,
     },
   });
 }
 
 function sendBotMenu(chatId) {
-  bot.sendMessage(chatId, "🤖 <b>Bot xizmatlari</b>\n\nQanday bot kerak?", {
+  const text = `🤖 <b>Bot xizmatlari</b>
+
+🎪 <i>Avtomatlashtirish va samaradorlik</i>
+
+🔥 Qanday bot kerak?`;
+
+  sendAnimatedMessage(chatId, text, {
     parse_mode: "HTML",
     reply_markup: {
-      inline_keyboard: [
-        [{ text: "🔹 Oddiy bot", callback_data: "Bot_simple" }],
-        [{ text: "🛒 E-commerce bot", callback_data: "Bot_ecommerce" }],
-        [{ text: "📊 CRM bot", callback_data: "Bot_crm" }],
-        [{ text: "⚡ Inline bot", callback_data: "Bot_inline" }],
-        [{ text: "💳 Payment bot", callback_data: "Bot_payment" }],
-        [{ text: "🔙 Ortga", callback_data: "back_main" }],
+      keyboard: [
+        ["🔹 Oddiy bot", "🛒 E-commerce bot"],
+        ["📊 CRM bot", "⚡ Inline bot"],
+        ["💳 Payment bot"],
+        ["🔙 Bosh menyuga qaytish"]
       ],
+      resize_keyboard: true,
     },
   });
 }
 
 function sendInnovationMenu(chatId) {
-  bot.sendMessage(chatId, "🧤 <b>Biz Yasayotgan Qolqop</b>\n\nAniqroq Malumotlar:", {
+  const text = `🧤 <b>Innovatsion loyiha</b>
+
+🌟 <i>Maxsus ehtiyojlar uchun qo'lqop</i>
+
+🎯 <b>Loyiha haqida:</b>
+• Soqovlar uchun maxsus qo'lqop
+• Imo-ishoralarni nutqqa aylantirish
+• Zamonaviy texnologiya
+
+📹 Videoni ko'ring va qo'llab-quvvatlang!`;
+
+  sendAnimatedMessage(chatId, text, {
     parse_mode: "HTML",
     reply_markup: {
       keyboard: [
-        ['Qolqop Haqida Malumot', 'Qolqopni Qanday Yasaymiz'],
-        ['Nimaga Yasamoqchimiz', 'Donat qilish'],
-        [{
-          text: 'qolqop vedio',
-          web_app: 'https://'
-        }]
+        ["📽️ Video ko'rish", "💝 Donat qilish"],
+        ["📋 Loyiha haqida", "🛠️ Qanday ishlaydi"],
+        ["🎯 Maqsadimiz"],
+        ["🔙 Bosh menyuga qaytish"]
       ],
+      resize_keyboard: true,
     },
   });
 }
@@ -223,14 +262,17 @@ function sendStatistics(chatId) {
   const totalUsers = Object.keys(userStats).length;
   const totalOrders = orderHistory.length;
   
-  const statsText = `📊 <b>Bot Statistikasi</b>\n\n` +
-    `🕒 Ish vaqti: ${Math.floor(uptime / 3600)}s ${Math.floor((uptime % 3600) / 60)}d ${Math.floor(uptime % 60)}s\n` +
-    `💾 Xotira: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB\n` +
-    `👥 Jami foydalanuvchilar: ${totalUsers}\n` +
-    `📦 Jami buyurtmalar: ${totalOrders}\n` +
-    `📅 Sana: ${moment().format("DD.MM.YYYY HH:mm")}`;
+  const statsText = `📊 <b>Bot Statistikasi</b>
 
-  bot.sendMessage(chatId, statsText, { parse_mode: "HTML" });
+🕒 <b>Ish vaqti:</b> ${Math.floor(uptime / 3600)}s ${Math.floor((uptime % 3600) / 60)}d ${Math.floor(uptime % 60)}s
+💾 <b>Xotira:</b> ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB
+👥 <b>Jami foydalanuvchilar:</b> ${totalUsers}
+📦 <b>Jami buyurtmalar:</b> ${totalOrders}
+📅 <b>Sana:</b> ${moment().format("DD.MM.YYYY HH:mm")}
+
+🔥 <i>Bot faol ishlayapti!</i>`;
+
+  sendAnimatedMessage(chatId, statsText, { parse_mode: "HTML" });
 }
 
 // Admin Functions
@@ -239,50 +281,66 @@ function sendAdminPanel(chatId, userId) {
     return bot.sendMessage(chatId, "❌ Sizda admin huquqlari yo'q!");
   }
 
-  bot.sendMessage(chatId, "👨‍💼 <b>Admin Panel</b>\n\nQuyidagi amallardan birini tanlang:", {
+  const text = `👨‍💼 <b>Admin Panel</b>
+
+🎛️ <i>Boshqaruv markazi</i>
+
+⚙️ Quyidagi amallardan birini tanlang:`;
+
+  sendAnimatedMessage(chatId, text, {
     parse_mode: "HTML",
     reply_markup: {
-      inline_keyboard: [
-        [{ text: "📊 Batafsil statistika", callback_data: "admin_stats" }],
-        [{ text: "📋 Buyurtmalar ro'yxati", callback_data: "admin_orders" }],
-        [{ text: "👥 Foydalanuvchilar", callback_data: "admin_users" }],
-        [{ text: "📢 Xabar yuborish", callback_data: "admin_broadcast" }],
-        [{ text: "🚫 Ban/Unban", callback_data: "admin_ban" }],
-        [{ text: "🔙 Ortga", callback_data: "back_main" }],
+      keyboard: [
+        ["📊 Batafsil statistika", "📋 Buyurtmalar"],
+        ["👥 Foydalanuvchilar", "📢 Xabar yuborish"],
+        ["🚫 Ban/Unban", "🗂️ Ma'lumotlar"],
+        ["🔙 Bosh menyuga qaytish"]
       ],
+      resize_keyboard: true,
     },
   });
 }
 
 // Price List Function
 function sendPriceList(chatId) {
-  let priceText = "💰 <b>Xizmat narxlari</b>\n\n";
+  let priceText = `💰 <b>Xizmat narxlari</b>
+
+💎 <i>Sifatli va arzon xizmatlar</i>
+
+`;
   
   Object.entries(servicePrices).forEach(([category, services]) => {
-    priceText += `<b>${category}</b>\n`;
+    priceText += `\n<b>${category}</b>\n`;
     Object.entries(services).forEach(([service, price]) => {
-      priceText += `• ${service}: ${formatPrice(price)}\n`;
+      priceText += `• ${service}: ${price}\n`;
     });
-    priceText += "\n";
   });
   
-  priceText += "💡 <i>Narxlar taxminiy bo'lib, loyiha murakkabligiga qarab o'zgarishi mumkin.</i>";
+  priceText += `\n💡 <i>Narxlar taxminiy bo'lib, loyiha murakkabligiga qarab o'zgarishi mumkin.</i>
+
+🎁 <b>Chegirmalar mavjud!</b>`;
   
-  bot.sendMessage(chatId, priceText, { parse_mode: "HTML" });
+  sendAnimatedMessage(chatId, priceText, { parse_mode: "HTML" });
 }
 
 // Contact Information
 function sendContactInfo(chatId) {
-  const contactText = `📞 <b>Bog'lanish ma'lumotlari</b>\n\n` +
-    `👨‍💻 Dasturchi: @KXNexsus\n` +
-    `📧 Email: info@kxnexsus.uz\n` +
-    `📱 Telefon: +998 90 123 45 67\n` +
-    `🌐 Website: https://kxnexsus.uz\n` +
-    `📺 Kanal: ${channelUsername}\n\n` +
-    `⏰ Ish vaqti: 09:00 - 18:00 (Dushanba-Juma)\n` +
-    `📍 Manzil: Toshkent, Uzbekiston`;
+  const contactText = `📞 <b>Bog'lanish ma'lumotlari</b>
 
-  bot.sendMessage(chatId, contactText, { parse_mode: "HTML" });
+🎯 <i>Har doim aloqada</i>
+
+👨‍💻 <b>Dasturchi:</b> @KXNexsus
+📧 <b>Email:</b> info@kxnexsus.uz
+📱 <b>Telefon:</b> +998 90 123 45 67
+🌐 <b>Website:</b> https://kxnexsus.uz
+📺 <b>Kanal:</b> ${channelUsername}
+
+⏰ <b>Ish vaqti:</b> 09:00 - 18:00 (Dushanba-Juma)
+📍 <b>Manzil:</b> Toshkent, Uzbekiston
+
+💬 <i>Savollaringiz uchun doimo tayyormiz!</i>`;
+
+  sendAnimatedMessage(chatId, contactText, { parse_mode: "HTML" });
 }
 
 // Error Handling
@@ -298,12 +356,23 @@ bot.deleteWebHook().then(() => {
   console.log("No webhook to delete or error:", err.message);
 });
 
+// Set bot commands
+const commands = [
+  { command: "start", description: "🚀 Botni ishga tushirish" },
+  { command: "menu", description: "🏠 Asosiy menyuni ochish" },
+  { command: "help", description: "❓ Yordam olish" },
+  { command: "prices", description: "💰 Xizmat narxlari" },
+  { command: "contact", description: "📞 Bog'lanish" },
+  { command: "stats", description: "📊 Statistika" },
+];
+
+bot.setMyCommands(commands);
+
 // Command Handlers
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
   
-  // Check if user is banned
   if (bannedUsers.has(userId)) {
     return bot.sendMessage(chatId, "🚫 Siz botdan foydalanish uchun ban qilingansiz.");
   }
@@ -316,51 +385,48 @@ bot.onText(/\/start/, async (msg) => {
     if (!["member", "administrator", "creator"].includes(res.status)) {
       return bot.sendMessage(
         chatId,
-        `Iltimos, quyidagi kanalga obuna bo'ling: ${channelUsername}`,
+        `🔔 <b>Kanalga obuna bo'ling!</b>
+
+📺 Iltimos, quyidagi kanalga obuna bo'ling: ${channelUsername}
+
+🎁 Obuna bo'lgandan keyin botdan to'liq foydalanishingiz mumkin!`,
         {
+          parse_mode: "HTML",
           reply_markup: {
-            inline_keyboard: [
-              [
-                {
-                  text: "🔗 Kanalga o'tish",
-                  url: `https://t.me/${channelUsername.replace("@", "")}`,
-                },
-              ],
-              [
-                {
-                  text: "✅ Obuna bo'ldim",
-                  callback_data: "check_subscription",
-                },
-              ],
+            keyboard: [
+              [{ text: "🔗 Kanalga o'tish", url: `https://t.me/${channelUsername.replace("@", "")}` }],
+              ["✅ Obuna bo'ldim, tekshirish"]
             ],
-          },
-        },
+            resize_keyboard: true
+          }
+        }
       );
     }
   } catch (err) {
     console.error(err);
     logToFile(`Subscription check error: ${err.message}`);
-    return bot.sendMessage(
-      chatId,
-      "❗ Bot kanalga admin bo'lishi kerak yoki kanal topilmadi.",
-    );
   }
 
-  const welcomeText = `👋 Xush kelibsiz, ${msg.from.first_name}!\n\n` +
-    `🤖 Men professional web dasturlash xizmatlarini taqdim etuvchi botman.\n\n` +
-    `🌟 Bizning xizmatlar:\n` +
-    `• Web-saytlar yaratish\n` +
-    `• Telegram botlar\n` +
-    `• Domen va hosting\n` +
-    `• Mobile ilovalar\n` +
-    `• Va boshqa ko'p narsalar!\n\n` +
-    `📞 Savollar uchun: @KXNexsus`;
+  const welcomeText = `🎉 <b>Xush kelibsiz, ${msg.from.first_name}!</b>
 
-  bot.sendMessage(chatId, welcomeText);
-  setTimeout(() => sendMainMenu(chatId), 1000);
+🚀 <i>Professional IT xizmatlar olamiga xush kelibsiz!</i>
+
+🌟 <b>Bizning xizmatlar:</b>
+• 🌐 Zamonaviy web-saytlar
+• 🤖 Aqlli Telegram botlar  
+• 🔑 Domen va hosting
+• 📱 Mobile ilovalar
+• 🧤 Innovatsion loyihalar
+
+💫 <i>Sifat va ishonch kafolatlaymiz!</i>
+
+📞 <b>Savollar uchun:</b> @KXNexsus`;
+
+  await sendAnimatedMessage(chatId, welcomeText, { parse_mode: "HTML" });
+  setTimeout(() => sendMainMenu(chatId), 2000);
 });
 
-bot.onText(/\/menyu/, (msg) => {
+bot.onText(/\/menu|\/menyu/, (msg) => {
   const chatId = msg.chat.id;
   updateUserStats(msg.from.id);
   sendMainMenu(chatId);
@@ -370,49 +436,27 @@ bot.onText(/\/help/, (msg) => {
   const chatId = msg.chat.id;
   updateUserStats(msg.from.id);
   
-  const helpText = `🤖 <b>Yordam</b>\n\n` +
-    `<b>Buyruqlar:</b>\n` +
-    `/start - Botni ishga tushirish\n` +
-    `/menyu - Asosiy menyuni ochish\n` +
-    `/help - Ushbu yordam xabarini ko'rsatish\n` +
-    `/status - Bot holatini ko'rish\n` +
-    `/info - Foydalanuvchi haqida ma'lumot\n` +
-    `/narxlar - Xizmat narxlari\n` +
-    `/contact - Bog'lanish ma'lumotlari\n\n` +
-    `<b>Qo'llab-quvvatlash:</b>\n` +
-    `📞 Telegram: @KXNexsus\n` +
-    `📧 Email: info@kxnexsus.uz\n` +
-    `📺 Kanal: ${channelUsername}`;
+  const helpText = `🤖 <b>Yordam bo'limi</b>
 
-  bot.sendMessage(chatId, helpText, { parse_mode: "HTML" });
+📋 <b>Mavjud buyruqlar:</b>
+/start - 🚀 Botni ishga tushirish
+/menu - 🏠 Asosiy menyuni ochish
+/help - ❓ Ushbu yordam xabarini ko'rsatish
+/prices - 💰 Xizmat narxlarini ko'rish
+/contact - 📞 Bog'lanish ma'lumotlari
+/stats - 📊 Bot statistikasi
+
+🛠️ <b>Qo'llab-quvvatlash:</b>
+📞 Telegram: @KXNexsus
+📧 Email: info@kxnexsus.uz
+📺 Kanal: ${channelUsername}
+
+💡 <i>Qo'shimcha yordam kerak bo'lsa, biz bilan bog'laning!</i>`;
+
+  sendAnimatedMessage(chatId, helpText, { parse_mode: "HTML" });
 });
 
-bot.onText(/\/status/, (msg) => {
-  const chatId = msg.chat.id;
-  updateUserStats(msg.from.id);
-  sendStatistics(chatId);
-});
-
-bot.onText(/\/info/, (msg) => {
-  const chatId = msg.chat.id;
-  const user = msg.from;
-  updateUserStats(user.id);
-  
-  const userStat = userStats[user.id] || {};
-  const info = `🙋‍♂️ <b>Foydalanuvchi haqida ma'lumot:</b>\n\n` +
-    `👤 Ismi: ${user.first_name || "Noma'lum"}\n` +
-    `👤 Familiyasi: ${user.last_name || "Noma'lum"}\n` +
-    `📝 Username: ${user.username ? "@" + user.username : "Yo'q"}\n` +
-    `🆔 ID: ${user.id}\n` +
-    `🌐 Til: ${user.language_code || "Noma'lum"}\n` +
-    `📊 Xabarlar soni: ${userStat.messageCount || 0}\n` +
-    `📅 Qo'shilgan sana: ${userStat.joinDate || "Noma'lum"}\n` +
-    `⏰ Oxirgi faollik: ${userStat.lastActive || "Noma'lum"}`;
-
-  bot.sendMessage(chatId, info, { parse_mode: "HTML" });
-});
-
-bot.onText(/\/narxlar/, (msg) => {
+bot.onText(/\/prices|\/narxlar/, (msg) => {
   const chatId = msg.chat.id;
   updateUserStats(msg.from.id);
   sendPriceList(chatId);
@@ -424,66 +468,10 @@ bot.onText(/\/contact/, (msg) => {
   sendContactInfo(chatId);
 });
 
-bot.onText(/\/admin/, (msg) => {
+bot.onText(/\/stats|\/statistika/, (msg) => {
   const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  updateUserStats(userId);
-  sendAdminPanel(chatId, userId);
-});
-
-// Callback Query Handler
-bot.on("callback_query", async (query) => {
-  const chatId = query.message.chat.id;
-  const data = query.data;
-  const userId = query.from.id;
-
-  bot.answerCallbackQuery(query.id);
-  updateUserStats(userId);
-
-  if (!userState[chatId]) userState[chatId] = {};
-
-  switch (data) {
-    case "check_subscription":
-      try {
-        const res = await bot.getChatMember(channelUsername, userId);
-        if (["member", "administrator", "creator"].includes(res.status)) {
-          bot.editMessageText("✅ Obuna tasdiqlandi!", {
-            chat_id: chatId,
-            message_id: query.message.message_id,
-          });
-          setTimeout(() => sendMainMenu(chatId), 1000);
-        } else {
-          bot.answerCallbackQuery(query.id, {
-            text: "❌ Hali ham obuna bo'lmagansiz!",
-            show_alert: true,
-          });
-        }
-      } catch (err) {
-        console.error(err);
-        bot.answerCallbackQuery(query.id, {
-          text: "❗ Obuna tekshiruvda xatolik yuz berdi.",
-          show_alert: true,
-        });
-      }
-      break;
-
-    case "back_main":
-      sendMainMenu(chatId);
-      break;
-
-    // Order handlers
-    default:
-      if (data.startsWith("order_") || data.startsWith("Domain_") || data.startsWith("Bot_") || data.startsWith("Innovation_")) {
-        userState[chatId] = { step: 1, serviceType: data };
-        bot.sendMessage(chatId, "📝 Ismingizni kiriting:", {
-          reply_markup: {
-            keyboard: [["🔙 Ortga"]],
-            resize_keyboard: true,
-          },
-        });
-      }
-      break;
-  }
+  updateUserStats(msg.from.id);
+  sendStatistics(chatId);
 });
 
 // Message Handler
@@ -494,15 +482,27 @@ bot.on("message", async (msg) => {
   const text = msg.text;
   const userId = msg.from.id;
   
-  // Check if user is banned
   if (bannedUsers.has(userId)) {
     return bot.sendMessage(chatId, "🚫 Siz botdan foydalanish uchun ban qilingansiz.");
   }
 
   updateUserStats(userId);
-  
-  // Skip non-text messages and commands
-  if (!text || text.startsWith("/")) return;
+
+  // Handle subscription check
+  if (text === "✅ Obuna bo'ldim, tekshirish") {
+    try {
+      const res = await bot.getChatMember(channelUsername, userId);
+      if (["member", "administrator", "creator"].includes(res.status)) {
+        bot.sendMessage(chatId, "✅ Obuna tasdiqlandi! Rahmat!", { parse_mode: "HTML" });
+        setTimeout(() => sendMainMenu(chatId), 1000);
+      } else {
+        bot.sendMessage(chatId, "❌ Hali ham obuna bo'lmagansiz! Iltimos, kanalga obuna bo'ling.");
+      }
+    } catch (err) {
+      bot.sendMessage(chatId, "❗ Obuna tekshiruvda xatolik yuz berdi.");
+    }
+    return;
+  }
 
   // Handle main menu keyboard buttons
   if (!userState[chatId] || userState[chatId].step === 0) {
@@ -516,7 +516,7 @@ bot.on("message", async (msg) => {
       case "🤖 Bot xizmatlari":
         sendBotMenu(chatId);
         break;
-      case "🧤 Innovatsion buyum":
+      case "🧤 Innovatsion loyiha":
         sendInnovationMenu(chatId);
         break;
       case "💰 Narxlar":
@@ -524,38 +524,312 @@ bot.on("message", async (msg) => {
         break;
       case "📦 Buyurtma berish":
         userState[chatId] = { step: 1, serviceType: "default_buyurtma" };
-        bot.sendMessage(chatId, "📝 Ismingizni kiriting:", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
           reply_markup: {
-            keyboard: [["🔙 Ortga"]],
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
             resize_keyboard: true,
           },
         });
         break;
-      case "👨‍💼 Admin":
+      case "👨‍💼 Admin panel":
         sendAdminPanel(chatId, userId);
         break;
       case "📊 Statistika":
         sendStatistics(chatId);
         break;
-      case "🗃 Ma'lumotlar":
-        bot.sendMessage(chatId, `📁 <b>Siz haqingizdagi ma'lumotlar:</b>\nIsmingiz: ${msg.from.first_name}\nID: ${msg.from.id}\nUsername: ${msg.from.username || "Yo'q"}`, {
-          parse_mode: "HTML",
-        });
+      case "ℹ️ Ma'lumotlar":
+        const userInfo = `📁 <b>Sizning ma'lumotlaringiz:</b>
+
+👤 <b>Ism:</b> ${msg.from.first_name || "Noma'lum"}
+👤 <b>Familiya:</b> ${msg.from.last_name || "Noma'lum"}
+📝 <b>Username:</b> ${msg.from.username ? "@" + msg.from.username : "Yo'q"}
+🆔 <b>ID:</b> ${msg.from.id}
+🌐 <b>Til:</b> ${msg.from.language_code || "Noma'lum"}
+
+🔒 <i>Ma'lumotlaringiz xavfsiz saqlanadi!</i>`;
+        
+        sendAnimatedMessage(chatId, userInfo, { parse_mode: "HTML" });
         break;
       case "📞 Bog'lanish":
         sendContactInfo(chatId);
         break;
       case "❌ Menyuni yopish":
         userState[chatId] = { step: 0 };
-        bot.sendMessage(chatId, "✅ Menyu yopildi. /menyu buyrug'ini yuboring", {
-          reply_markup: { remove_keyboard: true },
+        bot.sendMessage(chatId, "✅ Menyu yopildi.\n\n/menu buyrug'ini yuboring yoki 🔄 tugmasini bosing", {
+          reply_markup: {
+            keyboard: [["🔄 Menyuni ochish"]],
+            resize_keyboard: true
+          }
         });
         break;
-      default:
-        bot.sendMessage(chatId, "❓ Noma'lum buyruq. /help yuboring.", {
+      case "🔄 Menyuni ochish":
+        sendMainMenu(chatId);
+        break;
+
+      // Website service handlers
+      case "🆕 0 dan sayt":
+        userState[chatId] = { step: 1, serviceType: "order_0dan" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
           reply_markup: {
-            inline_keyboard: [[{ text: "📋 Menyu", callback_data: "back_main" }]],
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
           },
+        });
+        break;
+      case "📋 Template dan sayt":
+        userState[chatId] = { step: 1, serviceType: "order_template" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "🔄 Saytni yangilash":
+        userState[chatId] = { step: 1, serviceType: "order_update" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "📄 Landing page":
+        userState[chatId] = { step: 1, serviceType: "order_landing" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "🛒 E-commerce sayt":
+        userState[chatId] = { step: 1, serviceType: "order_ecommerce" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+
+      // Domain service handlers
+      case "🌐 Domen (.com)":
+        userState[chatId] = { step: 1, serviceType: "domain_com" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "🇺🇿 Domen (.uz)":
+        userState[chatId] = { step: 1, serviceType: "domain_uz" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "💾 Hosting xizmati":
+        userState[chatId] = { step: 1, serviceType: "hosting" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "🔒 SSL sertifikat":
+        userState[chatId] = { step: 1, serviceType: "ssl" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "💿 Backup xizmati":
+        userState[chatId] = { step: 1, serviceType: "backup" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+
+      // Bot service handlers
+      case "🔹 Oddiy bot":
+        userState[chatId] = { step: 1, serviceType: "bot_simple" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "🛒 E-commerce bot":
+        userState[chatId] = { step: 1, serviceType: "bot_ecommerce" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "📊 CRM bot":
+        userState[chatId] = { step: 1, serviceType: "bot_crm" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "⚡ Inline bot":
+        userState[chatId] = { step: 1, serviceType: "bot_inline" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+      case "💳 Payment bot":
+        userState[chatId] = { step: 1, serviceType: "bot_payment" };
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🔙 Bosh menyuga qaytish"]],
+            resize_keyboard: true,
+          },
+        });
+        break;
+
+      // Innovation menu handlers
+      case "📽️ Video ko'rish":
+        bot.sendMessage(chatId, `🎬 <b>Loyiha videosi</b>
+
+🧤 Soqovlar uchun maxsus qo'lqop loyihamizni ko'ring!
+
+📹 <a href="https://drive.google.com/file/d/1-5uau7c7YabLrJ9Beo5cO1-QNb6jmskt/view?usp=drivesdk">Videoni bu yerda ko'ring</a>
+
+💡 <i>Bu loyiha hayotni o'zgartiradi!</i>`, {
+          parse_mode: "HTML",
+          disable_web_page_preview: false
+        });
+        break;
+      case "💝 Donat qilish":
+        bot.sendMessage(chatId, `💝 <b>Loyihani qo'llab-quvvatlash</b>
+
+🎯 <i>Sizning yordam muhim!</i>
+
+💰 <b>Donat qilish usullari:</b>
+• 💳 Karta orqali
+• 📱 Click/Payme
+• 💵 Naqd pul
+
+📞 <b>To'lov uchun:</b> @KXNexsus
+
+🙏 <i>Har qanday yordam uchun rahmat!</i>`, {
+          parse_mode: "HTML"
+        });
+        break;
+      case "📋 Loyiha haqida":
+        bot.sendMessage(chatId, `📋 <b>Innovatsion qo'lqop loyihasi</b>
+
+🎯 <b>Maqsad:</b>
+Soqovlar uchun imo-ishoralarni nutqqa aylantiradigan qo'lqop yaratish
+
+🔬 <b>Texnologiya:</b>
+• AI va machine learning
+• Sensor texnologiyalar
+• Audio sintez
+
+👥 <b>Kimlar uchun:</b>
+• Soqov va kar-soqov insonlar
+• Ularning oila a'zolari
+• Jamiyat
+
+💡 <i>Bu dunyo-foyda yordam beradi!</i>`, {
+          parse_mode: "HTML"
+        });
+        break;
+      case "🛠️ Qanday ishlaydi":
+        bot.sendMessage(chatId, `🛠️ <b>Qo'lqop qanday ishlaydi?</b>
+
+🔄 <b>Jarayon:</b>
+1️⃣ Qo'lqop imo-ishoralarni sezadi
+2️⃣ AI orqali ularni tahlil qiladi  
+3️⃣ So'zga aylantirib ovozga chiqaradi
+4️⃣ Mikrofon orqali eshitiladi
+
+⚡ <b>Xususiyatlar:</b>
+• Real-time ishlash
+• Yuqori aniqlik
+• Chiroyli dizayn
+• Batareya bilan ishlash
+
+🚀 <i>Texnologiya kelajagi!</i>`, {
+          parse_mode: "HTML"
+        });
+        break;
+      case "🎯 Maqsadimiz":
+        bot.sendMessage(chatId, `🎯 <b>Bizning maqsadimiz</b>
+
+🌟 <b>Asosiy g'oya:</b>
+Soqov insonlarning hayotini osonlashtirish va ularni jamiyatga yaxshiroq integratsiya qilish
+
+💫 <b>Natijalar:</b>
+• Muloqot osonligi
+• Ishga joylashish imkoniyati
+• Ta'lim olish qulayligi
+• Ijtimoiy hayotda faollik
+
+🤝 <b>Hamkorlik:</b>
+• Xalqaro tashkilotlar bilan
+• Ta'lim muassasalari bilan
+• Tibbiyot markazlari bilan
+
+❤️ <i>Bizning missiyamiz - yordam berish!</i>`, {
+          parse_mode: "HTML"
+        });
+        break;
+      case "🔙 Bosh menyuga qaytish":
+        userState[chatId] = { step: 0 };
+        sendMainMenu(chatId);
+        break;
+
+      default:
+        bot.sendMessage(chatId, `❓ <b>Noma'lum buyruq!</b>
+
+🔍 Iltimos, menyudan tanlang yoki quyidagi buyruqlarni ishlating:
+• /menu - Asosiy menyu
+• /help - Yordam
+
+💡 <i>Savol bo'lsa: @KXNexsus</i>`, {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [["🏠 Bosh menyu"]],
+            resize_keyboard: true
+          }
         });
     }
     return;
@@ -563,7 +837,7 @@ bot.on("message", async (msg) => {
 
   const state = userState[chatId];
 
-  if (text === "🔙 Ortga") {
+  if (text === "🔙 Bosh menyuga qaytish") {
     userState[chatId] = { step: 0 };
     return sendMainMenu(chatId);
   }
@@ -573,27 +847,28 @@ bot.on("message", async (msg) => {
     case 1:
       state.name = text;
       state.step = 2;
-      bot.sendMessage(chatId, "📞 Telefon raqamingizni kiriting:", {
+      sendAnimatedMessage(chatId, "📞 <b>Telefon raqamingizni kiriting:</b>", {
+        parse_mode: "HTML",
         reply_markup: {
           keyboard: [
-            [{ text: "📱 Nomerni yuborish", request_contact: true }],
-            ["🔙 Ortga"]
+            [{ text: "📱 Raqamni yuborish", request_contact: true }],
+            ["🔙 Bosh menyuga qaytish"]
           ],
           resize_keyboard: true,
         },
       });
       break;
     case 2:
-      // Handle contact sharing
       if (msg.contact) {
         state.phone = msg.contact.phone_number;
       } else {
         state.phone = text;
       }
       state.step = 3;
-      bot.sendMessage(chatId, "📝 Loyiha haqida batafsil ma'lumot bering:", {
+      sendAnimatedMessage(chatId, "📝 <b>Loyiha haqida batafsil ma'lumot bering:</b>", {
+        parse_mode: "HTML",
         reply_markup: {
-          keyboard: [["🔙 Ortga"]],
+          keyboard: [["🔙 Bosh menyuga qaytish"]],
           resize_keyboard: true,
         },
       });
@@ -601,9 +876,10 @@ bot.on("message", async (msg) => {
     case 3:
       state.description = text;
       state.step = 4;
-      bot.sendMessage(chatId, "💰 Taxminiy byudjetingiz (so'mda):", {
+      sendAnimatedMessage(chatId, "💰 <b>Taxminiy byudjetingiz (so'mda):</b>", {
+        parse_mode: "HTML",
         reply_markup: {
-          keyboard: [["🔙 Ortga"]],
+          keyboard: [["🔙 Bosh menyuga qaytish"]],
           resize_keyboard: true,
         },
       });
@@ -611,32 +887,25 @@ bot.on("message", async (msg) => {
     case 4:
       state.budget = text;
       
-      // Generate service name
       const serviceName = {
-        order_0dan: "0 dan sayt",
-        order_clone: "Template dan sayt",
+        order_0dan: "0 dan sayt yaratish",
+        order_template: "Template dan sayt",
         order_update: "Saytni yangilash",
         order_landing: "Landing page",
         order_ecommerce: "E-commerce sayt",
-        Domain_com: "Domen (.com)",
-        Domain_uz: "Domen (.uz)",
-        Domain_hosting: "Hosting xizmati",
-        Domain_ssl: "SSL sertifikat",
-        Domain_backup: "Backup xizmati",
-        Bot_simple: "Oddiy bot",
-        Bot_ecommerce: "E-commerce bot",
-        Bot_crm: "CRM bot",
-        Bot_inline: "Inline bot",
-        Bot_payment: "Payment bot",
-        Innovation_mobile: "Mobile app",
-        Innovation_desktop: "Desktop app",
-        Innovation_api: "API integration",
-        Innovation_database: "Database design",
-        Innovation_optimization: "System optimization",
+        domain_com: "Domen (.com)",
+        domain_uz: "Domen (.uz)",
+        hosting: "Hosting xizmati",
+        ssl: "SSL sertifikat",
+        backup: "Backup xizmati",
+        bot_simple: "Oddiy bot",
+        bot_ecommerce: "E-commerce bot",
+        bot_crm: "CRM bot",
+        bot_inline: "Inline bot",
+        bot_payment: "Payment bot",
         default_buyurtma: "Umumiy buyurtma",
       }[state.serviceType] || "Umumiy buyurtma";
 
-      // Create order summary
       const orderData = {
         name: state.name,
         phone: state.phone,
@@ -648,44 +917,50 @@ bot.on("message", async (msg) => {
         chatId: chatId
       };
       
-      const summary = `📥 *Yangi Buyurtma*\n\n` +
-        `👤 <b>Ism:</b> ${state.name}\n` +
-        `📞 <b>Telefon:</b> ${state.phone}\n` +
-        `🛠 <b>Xizmat:</b> ${serviceName}\n` +
-        `📝 <b>Tavsif:</b> ${state.description}\n` +
-        `💰 <b>Byudjet:</b> ${state.budget}\n` +
-        `👨‍💻 <b>Username:</b> @${msg.from.username || "Yo'q"}\n` +
-        `🆔 <b>User ID:</b> ${userId}\n` +
-        `📅 <b>Sana:</b> ${moment().format("DD.MM.YYYY HH:mm")}`;
+      const summary = `📥 <b>Yangi Buyurtma!</b>
 
-      // Save order
+👤 <b>Ism:</b> ${state.name}
+📞 <b>Telefon:</b> ${state.phone}
+🛠 <b>Xizmat:</b> ${serviceName}
+📝 <b>Tavsif:</b> ${state.description}
+💰 <b>Byudjet:</b> ${state.budget}
+👨‍💻 <b>Username:</b> @${msg.from.username || "Yo'q"}
+🆔 <b>User ID:</b> ${userId}
+📅 <b>Sana:</b> ${moment().format("DD.MM.YYYY HH:mm")}`;
+
       orderHistory.push(orderData);
-      saveOrderToFi  le(orderData);
+      saveOrderToFile(orderData);
       
-      // Update user stats
       if (userStats[userId]) {
         userStats[userId].orderCount++;
       }
 
-      // Send confirmation to user
-      bot.sendMessage(chatId, "✅ Buyurtmangiz qabul qilindi!\n\n🕐 Bizning mutaxassislar tez orada siz bilan bog'lanishadi.\n\n📞 Shoshilinch holatlarda: @KXNexsus");
+      sendAnimatedMessage(chatId, `✅ <b>Buyurtmangiz qabul qilindi!</b>
+
+🎉 <i>Rahmat! Sizning buyurtmangiz muvaffaqiyatli ro'yxatga olindi.</i>
+
+🕐 <b>Keyingi qadam:</b>
+Bizning mutaxassislar 1-2 soat ichida siz bilan bog'lanishadi.
+
+📞 <b>Shoshilinch holatlarda:</b> @KXNexsus
+
+💼 <b>Buyurtma raqami:</b> #${orderHistory.length}`, {
+        parse_mode: "HTML"
+      });
       
-      // Send to admin
-      bot.sendMessage(adminChatId, escapeMarkdown(summary), {
-        parse_mode: "Markdown",
+      bot.sendMessage(adminChatId, summary, {
+        parse_mode: "HTML",
         reply_markup: {
-          inline_keyboard: [
-            [
-              { text: "✅ Qabul qilish", callback_data: `accept_${orderHistory.length}` },
-              { text: "❌ Rad etish", callback_data: `reject_${orderHistory.length}` }
-            ],
-            [{ text: "💬 Javob berish", url: `https://t.me/${msg.from.username || msg.from.id}` }]
-          ]
+          keyboard: [
+            ["✅ Qabul qilish", "❌ Rad etish"],
+            [`💬 Javob berish: @${msg.from.username || msg.from.id}`]
+          ],
+          resize_keyboard: true
         }
       });
 
       userState[chatId] = { step: 0 };
-      sendMainMenu(chatId);
+      setTimeout(() => sendMainMenu(chatId), 3000);
       break;
   }
 });
@@ -695,10 +970,29 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send(`
-    <h1>🤖 Telegram Bot Working!</h1>
-    <p>Bot holati: ✅ Aktiv</p>
-    <p>Server vaqti: ${moment().format("DD.MM.YYYY HH:mm:ss")}</p>
-    <p>Uptime: ${Math.floor(process.uptime())} soniya</p>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>🤖 Telegram Bot</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+            .container { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 0 auto; max-width: 500px; }
+            h1 { margin-bottom: 20px; }
+            .status { font-size: 24px; margin: 20px 0; }
+            .info { margin: 10px 0; font-size: 18px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🤖 Professional IT Bot</h1>
+            <div class="status">✅ Bot aktiv ishlayapti!</div>
+            <div class="info">⏰ Server vaqti: ${moment().format("DD.MM.YYYY HH:mm:ss")}</div>
+            <div class="info">🚀 Uptime: ${Math.floor(process.uptime())} soniya</div>
+            <div class="info">👥 Foydalanuvchilar: ${Object.keys(userStats).length}</div>
+            <div class="info">📦 Buyurtmalar: ${orderHistory.length}</div>
+        </div>
+    </body>
+    </html>
   `);
 });
 
@@ -708,7 +1002,8 @@ app.get("/stats", (req, res) => {
     totalOrders: orderHistory.length,
     uptime: process.uptime(),
     memory: process.memoryUsage(),
-    timestamp: moment().format("YYYY-MM-DD HH:mm:ss")
+    timestamp: moment().format("YYYY-MM-DD HH:mm:ss"),
+    status: "active"
   };
   res.json(stats);
 });
@@ -722,3 +1017,9 @@ app.listen(PORT, "0.0.0.0", () => {
 // Log bot start
 console.log("🤖 Telegram bot ishga tushdi!");
 logToFile("Bot started successfully");
+
+// Log memory usage every hour
+setInterval(() => {
+  const memUsage = process.memoryUsage();
+  logToFile(`Memory usage: ${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+}, 3600000);
