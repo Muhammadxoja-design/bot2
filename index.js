@@ -22,8 +22,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Bot Settings
-const adminChatId = -4972889819;
-const publicChatId = -4972889819;
+const adminChatId = -1002772299767;
+const publicChatId = -1002772299767;
 const channelUsername = "@hayoti_tajribam";
 const userState = {};
 const userStats = {};
