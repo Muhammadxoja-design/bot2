@@ -23,8 +23,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Bot Settings
-const adminChatId = -277229767;
-const publicChatId = -277229767; // Ommaviy chat ID
+const adminChatId = -2772299767;
+const publicChatId = -2772299767; // Ommaviy chat ID
 const channelUsername = "@hayoti_tajribam";
 const userState = {};
 const userStats = {};
