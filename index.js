@@ -1046,6 +1046,24 @@ Bizning mutaxassislar 1-2 soat ichida siz bilan bog'lanishadi.
       break;
   }
 });
+const ADMIN_ID = 6813216374; // ← o‘zingni Telegram ID'ingni yoz!
+
+bot.onText(/\/resetusers/, (msg) => {
+  const chatId = msg.chat.id;
+
+  if (msg.from.id !== ADMIN_ID) {
+    return bot.sendMessage(chatId, "❌ Sizda ruxsat yo‘q.");
+  }
+
+  db.query("DELETE FROM foydalanuvchilar", (err, result) => {
+    if (err) {
+      console.error("❌ Ma'lumotlarni o‘chirishda xatolik:", err);
+      bot.sendMessage(chatId, "❌ Xatolik yuz berdi.");
+    } else {
+      bot.sendMessage(chatId, `✅ ${result.affectedRows} foydalanuvchi o‘chirildi.`);
+    }
+  });
+});
 
 // Express Routes
 app.use(express.json());
