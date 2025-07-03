@@ -1,3 +1,4 @@
+
 const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 const moment = require("moment");
@@ -22,8 +23,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Bot Settings
-const adminChatId = -1002772299767;
-const publicChatId = -1002772299767;
+const adminChatId = -277229767;
+const publicChatId = -277229767; // Ommaviy chat ID
 const channelUsername = "@hayoti_tajribam";
 const userState = {};
 const userStats = {};
@@ -37,196 +38,71 @@ const servicePrices = {
     "Template dan sayt": '50,000 - 300,000 so\'m',
     "Saytni yangilash": '50,000 - 600,000 so\'m',
     "Landing page": '50,000 - 200,000 so\'m',
-    "E-commerce sayt": '100,000 - 1,500,000 so\'m'
+    "E-commerce sayt": '100,000 - 1,500,000 so\'m',
+    "Admin": 'https://t.me/m_kimyonazarov'
   },
   "🔑 Domen & Hosting": {
     "Domen (.com)": '150,000 so\'m',
     "Domen (.uz)": '150,000 so\'m',
     "Hosting (yillik)": '400,000 so\'m',
     "SSL sertifikat": '200,000 so\'m',
-    "Backup xizmati": '250,000 so\'m'
+    "Backup xizmati": '250,000 so\'m',
+    "Admin": 'https://t.me/m_kimyonazarov'
   },
   "🤖 Bot xizmatlari": {
     "Oddiy bot": '80,000 so\'m (chegirmada)',
     "E-commerce bot": '200,000 so\'m (chegirmada)',
     "CRM bot": '200,000 so\'m',
     "Inline bot": '120,000 so\'m',
-    "Payment bot": '250,000 so\'m'
+    "Payment bot": '250,000 so\'m',
+    "Admin": 'https://t.me/m_kimyonazarov'
   },
-  "📈 Trading o'quv kursi": {
-    "Boshlang'ich kurs": '500,000 so\'m',
-    "O'rta daraja": '800,000 so\'m',
-    "Professional": '1,200,000 so\'m',
-    "VIP mentorlik": '2,000,000 so\'m',
-    "Guruh kursi": '300,000 so\'m'
-  }
 };
 
-// Trading course data
-const tradingCourses = {
-  beginner: {
-    title: "📚 Boshlang'ich Trading Kursi",
-    duration: "4 hafta",
-    lessons: 16,
-    description: "Trading asoslari, bozor tahlili, risk menejment",
-    price: "500,000 so'm",
-    features: [
-      "✅ Trading asoslari",
-      "✅ Texnik tahlil",
-      "✅ Risk menejment", 
-      "✅ Demo trading",
-      "✅ 24/7 qo'llab-quvvatlash"
-    ]
-  },
-  intermediate: {
-    title: "🎯 O'rta Daraja Kursi",
-    duration: "6 hafta", 
-    lessons: 24,
-    description: "Murakkab strategiyalar, portfel boshqaruvi",
-    price: "800,000 so'm",
-    features: [
-      "✅ Murakkab strategiyalar",
-      "✅ Portfel boshqaruvi",
-      "✅ Psixologiya", 
-      "✅ Real trading",
-      "✅ Shaxsiy mentor"
-    ]
-  },
-  professional: {
-    title: "🚀 Professional Kurs",
-    duration: "8 hafta",
-    lessons: 32, 
-    description: "Professional treyderlik, algoritm trading",
-    price: "1,200,000 so'm",
-    features: [
-      "✅ Algoritm trading",
-      "✅ Quant strategiyalar",
-      "✅ Risk modellari",
-      "✅ Professional dasturlar", 
-      "✅ Sertifikat"
-    ]
-  },
-  vip: {
-    title: "👑 VIP Mentorlik",
-    duration: "12 hafta",
-    lessons: "Unlimited",
-    description: "Shaxsiy mentor, real pul bilan trading",
-    price: "2,000,000 so'm", 
-    features: [
-      "✅ 1-on-1 mentorlik",
-      "✅ Real kapital",
-      "✅ Professional dasturlar",
-      "✅ Kunlik maslahatlar",
-      "✅ Profit sharing"
-    ]
-  }
-};
-
-// Enhanced Animation System
-class AnimationEngine {
-  static async typeWriter(chatId, text, options = {}) {
-    const chunks = text.match(/.{1,50}/g) || [text];
-    let currentText = "";
-
-    const sentMessage = await bot.sendMessage(chatId, "⌨️ Yozilmoqda...", options);
-
-    for (let i = 0; i < chunks.length; i++) {
-      currentText += chunks[i];
-      await new Promise(resolve => setTimeout(resolve, 300));
-
-      try {
-        await bot.editMessageText(currentText + "▌", {
-          chat_id: chatId,
-          message_id: sentMessage.message_id,
-          ...options
-        });
-      } catch (e) {}
-    }
-
-    await bot.editMessageText(text, {
-      chat_id: chatId,
-      message_id: sentMessage.message_id,
-      ...options
-    });
-
-    return sentMessage;
-  }
-
-  static async progressBar(chatId, text, options = {}) {
-    const progressSteps = [
-      "▱▱▱▱▱▱▱▱▱▱ 0%",
-      "▰▱▱▱▱▱▱▱▱▱ 10%", 
-      "▰▰▱▱▱▱▱▱▱▱ 20%",
-      "▰▰▰▱▱▱▱▱▱▱ 30%",
-      "▰▰▰▰▱▱▱▱▱▱ 40%",
-      "▰▰▰▰▰▱▱▱▱▱ 50%",
-      "▰▰▰▰▰▰▱▱▱▱ 60%",
-      "▰▰▰▰▰▰▰▱▱▱ 70%",
-      "▰▰▰▰▰▰▰▰▱▱ 80%", 
-      "▰▰▰▰▰▰▰▰▰▱ 90%",
-      "▰▰▰▰▰▰▰▰▰▰ 100%"
-    ];
-
-    const sentMessage = await bot.sendMessage(chatId, `🔄 Yuklanmoqda...\n${progressSteps[0]}`, options);
-
-    for (let i = 1; i < progressSteps.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      try {
-        await bot.editMessageText(`🔄 Yuklanmoqda...\n${progressSteps[i]}`, {
-          chat_id: chatId,
-          message_id: sentMessage.message_id,
-          ...options
-        });
-      } catch (e) {}
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await bot.editMessageText(text, {
-      chat_id: chatId,
-      message_id: sentMessage.message_id,
-      ...options
-    });
-
-    return sentMessage;
-  }
-
-  static async spinnerAnimation(chatId, text, options = {}) {
-    const spinners = ["🔄", "🔃", "⚡", "✨", "🎯", "🚀"];
-    let currentSpinner = 0;
-
-    const sentMessage = await bot.sendMessage(chatId, `${spinners[0]} Yuklanmoqda...`, options);
-
-    const interval = setInterval(async () => {
-      currentSpinner = (currentSpinner + 1) % spinners.length;
-      try {
-        await bot.editMessageText(`${spinners[currentSpinner]} Yuklanmoqda...`, {
-          chat_id: chatId,
-          message_id: sentMessage.message_id,
-          ...options
-        });
-      } catch (e) {}
-    }, 300);
-
-    setTimeout(async () => {
-      clearInterval(interval);
-      await bot.editMessageText(text, {
+// Animation helper function
+function sendAnimatedMessage(chatId, text, options = {}) {
+  const loadingText = "⏳ Yuklanmoqda";
+  const loadingSteps = ["⏳", "🔄", "✨", "🎯"];
+  let currentStep = 0;
+  
+  // Sanitize the text before sending
+  const sanitizedText = options.parse_mode === "HTML" ? sanitizeMessage(text) : text;
+  
+  return bot.sendMessage(chatId, loadingText, options).then(sentMessage => {
+    const interval = setInterval(() => {
+      currentStep = (currentStep + 1) % loadingSteps.length;
+      bot.editMessageText(`${loadingSteps[currentStep]} Yuklanmoqda...`, {
         chat_id: chatId,
         message_id: sentMessage.message_id,
         ...options
+      }).catch(() => {});
+    }, 300);
+    
+    setTimeout(() => {
+      clearInterval(interval);
+      bot.editMessageText(sanitizedText, {
+        chat_id: chatId,
+        message_id: sentMessage.message_id,
+        ...options
+      }).catch(() => {
+        bot.sendMessage(chatId, sanitizedText, options);
       });
-    }, 2000);
-
+    }, 1200);
+    
     return sentMessage;
-  }
+  });
 }
 
-// Improved message sanitizer
+// Utility Functions
+function escapeMarkdown(text) {
+  return text.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, "\\$1");
+}
+
 function sanitizeMessage(text) {
   return sanitizeHtml(text, {
-    allowedTags: ['b', 'i', 'u', 's', 'code', 'pre', 'a', 'em', 'strong'],
+    allowedTags: ['b', 'i', 'u', 's', 'code', 'pre', 'a'],
     allowedAttributes: {
-      'a': ['href'],
-      'code': ['class']
+      'a': ['href']
     },
     textFilter: function(text) {
       return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -234,7 +110,6 @@ function sanitizeMessage(text) {
   });
 }
 
-// Enhanced logging
 function logToFile(content) {
   const filePath = path.join(__dirname, "logs.txt");
   const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -244,28 +119,25 @@ function logToFile(content) {
 function saveOrderToFile(order) {
   const filePath = path.join(__dirname, "orders.json");
   let orders = [];
-
+  
   try {
     if (fs.existsSync(filePath)) {
       orders = JSON.parse(fs.readFileSync(filePath, "utf8"));
     }
   } catch (error) {
     console.error("Order file read error:", error);
-    logToFile(`Order file error: ${error.message}`);
   }
-
+  
   orders.push({
     ...order,
     timestamp: moment().format("YYYY-MM-DD HH:mm:ss"),
     id: orders.length + 1
   });
-
+  
   try {
     fs.writeFileSync(filePath, JSON.stringify(orders, null, 2));
-    logToFile(`Order saved: ${order.name} - ${order.service}`);
   } catch (error) {
     console.error("Order file write error:", error);
-    logToFile(`Order save error: ${error.message}`);
   }
 }
 
@@ -275,17 +147,16 @@ function updateUserStats(userId) {
       messageCount: 0,
       lastActive: moment().format("YYYY-MM-DD HH:mm:ss"),
       joinDate: moment().format("YYYY-MM-DD HH:mm:ss"),
-      orderCount: 0,
-      tradingCourses: []
+      orderCount: 0
     };
   }
-
+  
   userStats[userId].messageCount++;
   userStats[userId].lastActive = moment().format("YYYY-MM-DD HH:mm:ss");
 }
 
 function isAdmin(userId) {
-  const adminIds = [123456789, 987654321]; // Add your admin IDs here
+  const adminIds = [adminChatId, 6813216374];
   return adminIds.includes(userId);
 }
 
@@ -303,39 +174,34 @@ function getPublicChatWelcome(firstName) {
 • 🤖 Telegram bot dasturlash
 • 🔑 Domen va hosting xizmati
 • 📱 Mobil ilovalar yaratish
-• 📈 Trading o'quv kurslari
 • 🧤 Innovatsion IT loyihalar
 
 📞 <b>Buyurtma berish:</b> Botga shaxsiy xabar yuboring
-👨‍💻 <b>Mutahassis:</b> @KXNexsus
+👨‍💻 <b>Mutahassis:</b> <a href="https://t.me/KXNexsus">KX Nexsus</a>
 📺 <b>Kanal:</b> ${channelUsername}
+🤖 <b>Botni yaxshilash haqidagi fikiringgizni <a href="https://t.me/m_kimyonazarov">Muhammadxojaga</a> yozing. Sizning fikiringgiz biz uchun muhum! </b>
 
 💡 <i>Sifatli xizmat va professional yondashuv!</i>`;
 }
 
-// Enhanced Main Menu
+// Main Menu Function
 function sendMainMenu(chatId) {
   const welcomeText = `🏠 <b>Bosh menyu</b>
 
-🌟 <i>Professional IT xizmatlar va ta'lim markazi</i>
+🌟 <i>Professional IT xizmatlar markazi</i>
 
-📋 <b>Mavjud xizmatlar:</b>
-• 💻 IT xizmatlar
-• 📈 Trading ta'limi
-• 🧤 Innovatsion loyihalar
+📋 Quyidagi xizmatlardan birini tanlang:`;
 
-⚡ Quyidagi bo'limlardan birini tanlang:`;
-
-  return AnimationEngine.progressBar(chatId, welcomeText, {
+  sendAnimatedMessage(chatId, welcomeText, {
     parse_mode: "HTML",
     reply_markup: {
       keyboard: [
         ["🌐 Web-sayt", "🔑 Domen & Hosting"],
-        ["🤖 Bot xizmatlari", "📈 Trading kurslari"],
-        ["🧤 Innovatsion loyiha", "📦 Buyurtma berish"],
-        ["💰 Narxlar", "📊 Statistika"],
-        ["📞 Bog'lanish", "👨‍💼 Admin panel"],
-        ["ℹ️ Ma'lumotlar", "❌ Menyuni yopish"]
+        ["🤖 Bot xizmatlari", "🧤 Innovatsion loyiha"],
+        ["📦 Buyurtma berish", "💰 Narxlar"],
+        ["📊 Statistika", "📞 Bog'lanish"],
+        ["👨‍💼 Admin panel", "ℹ️ Ma'lumotlar"],
+        ["❌ Menyuni yopish"]
       ],
       resize_keyboard: true,
       one_time_keyboard: false
@@ -343,28 +209,21 @@ function sendMainMenu(chatId) {
   });
 }
 
-// Trading Menu Functions
-function sendTradingMenu(chatId) {
-  const text = `📈 <b>Trading O'quv Kurslari</b>
+// Service Menus
+function sendWebsiteMenu(chatId) {
+  const text = `🌐 <b>Web-sayt xizmatlari</b>
 
-🎓 <i>Professional treyderlik o'rganing!</i>
+🚀 <i>Zamonaviy va professional saytlar</i>
 
-💎 <b>Kurs darajalari:</b>
-• 📚 Boshlang'ich - 500,000 so'm
-• 🎯 O'rta daraja - 800,000 so'm  
-• 🚀 Professional - 1,200,000 so'm
-• 👑 VIP Mentorlik - 2,000,000 so'm
+🎯 Qanday sayt kerak?`;
 
-🔥 Qaysi darajani tanlaysiz?`;
-
-  return AnimationEngine.typeWriter(chatId, text, {
+  sendAnimatedMessage(chatId, text, {
     parse_mode: "HTML",
     reply_markup: {
       keyboard: [
-        ["📚 Boshlang'ich kurs", "🎯 O'rta daraja"],
-        ["🚀 Professional kurs", "👑 VIP Mentorlik"],
-        ["👥 Guruh kursi", "📋 Kurs haqida"],
-        ["💼 Trading strategiyalar", "📊 Bozor tahlili"],
+        ["🆕 0 dan sayt", "📋 Template dan sayt"],
+        ["🔄 Saytni yangilash", "📄 Landing page"],
+        ["🛒 E-commerce sayt"],
         ["🔙 Bosh menyuga qaytish"]
       ],
       resize_keyboard: true,
@@ -372,182 +231,121 @@ function sendTradingMenu(chatId) {
   });
 }
 
-function sendTradingCourseInfo(chatId, courseType) {
-  const course = tradingCourses[courseType];
-  if (!course) return;
+function sendDomainMenu(chatId) {
+  const text = `🔑 <b>Domen & Hosting xizmatlari</b>
 
-  const text = `${course.title}
+🌐 <i>Ishonchli va tezkor hosting</i>
 
-⏱️ <b>Davomiyligi:</b> ${course.duration}
-📚 <b>Darslar soni:</b> ${course.lessons}
-💰 <b>Narxi:</b> ${course.price}
+⚡ Nima kerak?`;
 
-📝 <b>Tavsif:</b>
-${course.description}
-
-✨ <b>Kurs tarkibi:</b>
-${course.features.join('\n')}
-
-🎁 <b>Bonus:</b>
-• Telegram guruhga kirish
-• PDF materiallar
-• Video darslar
-• Amaliy topshiriqlar
-
-💡 <i>Professional treyder bo'ling!</i>`;
-
-  return AnimationEngine.spinnerAnimation(chatId, text, {
+  sendAnimatedMessage(chatId, text, {
     parse_mode: "HTML",
     reply_markup: {
       keyboard: [
-        ["📝 Kursga yozilish", "📞 Maslahat olish"],
-        ["🔙 Trading menyuga qaytish"]
+        ["🌐 Domen (.com)", "🇺🇿 Domen (.uz)"],
+        ["💾 Hosting xizmati", "🔒 SSL sertifikat"],
+        ["💿 Backup xizmati"],
+        ["🔙 Bosh menyuga qaytish"]
       ],
-      resize_keyboard: true
-    }
+      resize_keyboard: true,
+    },
   });
 }
 
-function sendTradingStrategies(chatId) {
-  const text = `💼 <b>Trading Strategiyalar</b>
+function sendBotMenu(chatId) {
+  const text = `🤖 <b>Bot xizmatlari</b>
 
-🎯 <b>Asosiy strategiyalar:</b>
+🎪 <i>Avtomatlashtirish va samaradorlik</i>
 
-📊 <b>1. Texnik Tahlil</b>
-• Support va Resistance
-• Moving Average
-• RSI va MACD
-• Candlestick pattern
+🔥 Qanday bot kerak?`;
 
-📈 <b>2. Fundamental Tahlil</b>
-• Iqtisodiy yangiliklar
-• Kompaniya hisobotlari
-• Bozor kayfiyati
-• Global hodisalar
-
-⚡ <b>3. Risk Menejment</b>
-• Stop Loss va Take Profit
-• Position sizing
-• Risk/Reward ratio
-• Diversifikatsiya
-
-🚀 <b>4. Psixologiya</b>
-• Emotsiyalarni nazorat qilish
-• Sabr-toqat
-• Intizom
-• Stress boshqaruvi
-
-💡 <i>Har bir strategiya batafsil o'rgatiladi!</i>`;
-
-  return AnimationEngine.typeWriter(chatId, text, {
-    parse_mode: "HTML"
+  sendAnimatedMessage(chatId, text, {
+    parse_mode: "HTML",
+    reply_markup: {
+      keyboard: [
+        ["🔹 Oddiy bot", "🛒 E-commerce bot"],
+        ["📊 CRM bot", "⚡ Inline bot"],
+        ["💳 Payment bot"],
+        ["🔙 Bosh menyuga qaytish"]
+      ],
+      resize_keyboard: true,
+    },
   });
 }
 
-function sendMarketAnalysis(chatId) {
-  const text = `📊 <b>Bugungi Bozor Tahlili</b>
+function sendInnovationMenu(chatId) {
+  const text = `🧤 <b>Innovatsion loyiha</b>
 
-📅 <b>Sana:</b> ${moment().format("DD.MM.YYYY")}
+🌟 <i>Maxsus ehtiyojlar uchun qo'lqop</i>
 
-📈 <b>Asosiy bozorlar:</b>
+🎯 <b>Loyiha haqida:</b>
+• Soqovlar uchun maxsus qo'lqop
+• Imo-ishoralarni nutqqa aylantirish
+• Zamonaviy texnologiya
 
-💰 <b>Forex:</b>
-• EUR/USD: 📈 1.0850 (+0.25%)
-• GBP/USD: 📉 1.2650 (-0.15%)
-• USD/JPY: 📈 150.25 (+0.40%)
+📹 Videoni ko'ring va qo'llab-quvvatlang!`;
 
-📊 <b>Crypto:</b>
-• Bitcoin: 📈 $42,500 (+2.1%)
-• Ethereum: 📈 $2,650 (+1.8%)
-• BNB: 📉 $320 (-0.5%)
-
-🏆 <b>Aksiyalar:</b>
-• Apple: 📈 $195.50 (+1.2%)
-• Tesla: 📉 $240.25 (-2.3%)
-• Google: 📈 $142.80 (+0.8%)
-
-🔥 <b>Bugungi imkoniyatlar:</b>
-• Gold pullback kutilmoqda
-• Tech aksiyalar kuchli
-• Crypto volatil
-
-⚠️ <i>Bu ma'lumotlar ta'limiy maqsadda!</i>`;
-
-  return AnimationEngine.progressBar(chatId, text, {
-    parse_mode: "HTML"
+  sendAnimatedMessage(chatId, text, {
+    parse_mode: "HTML",
+    reply_markup: {
+      keyboard: [
+        ["📽️ Video ko'rish", "💝 Donat qilish"],
+        ["📋 Loyiha haqida", "🛠️ Qanday ishlaydi"],
+        ["🎯 Maqsadimiz"],
+        ["🔙 Bosh menyuga qaytish"]
+      ],
+      resize_keyboard: true,
+    },
   });
 }
 
-// Enhanced Admin Panel
+// Statistics Function
+function sendStatistics(chatId) {
+  const memoryUsage = process.memoryUsage();
+  const uptime = process.uptime();
+  const totalUsers = Object.keys(userStats).length;
+  const totalOrders = orderHistory.length;
+  
+  const statsText = `📊 <b>Bot Statistikasi</b>
+
+🕒 <b>Ish vaqti:</b> ${Math.floor(uptime / 3600)}s ${Math.floor((uptime % 3600) / 60)}d ${Math.floor(uptime % 60)}s
+💾 <b>Xotira:</b> ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB
+👥 <b>Jami foydalanuvchilar:</b> ${totalUsers}
+📦 <b>Jami buyurtmalar:</b> ${totalOrders}
+📅 <b>Sana:</b> ${moment().format("DD.MM.YYYY HH:mm")}
+
+🔥 <i>Bot faol ishlayapti!</i>`;
+
+  sendAnimatedMessage(chatId, statsText, { parse_mode: "HTML" });
+}
+
+// Admin Functions
 function sendAdminPanel(chatId, userId) {
   if (!isAdmin(userId)) {
-    return bot.sendMessage(chatId, "❌ Sizda admin huquqlari yo'q!");
+    return bot.sendMessage(chatId, `❌ Sizda admin huquqlari yo'q!\n
+    admin: @KXNexsus\n
+    admin: @m_kimyonazarov\n
+    `);
   }
 
   const text = `👨‍💼 <b>Admin Panel</b>
 
 🎛️ <i>Boshqaruv markazi</i>
 
-📊 <b>Tezkor ma'lumotlar:</b>
-• Foydalanuvchilar: ${Object.keys(userStats).length}
-• Buyurtmalar: ${orderHistory.length}
-• Ban qilinganlar: ${bannedUsers.size}
-
 ⚙️ Quyidagi amallardan birini tanlang:`;
 
-  return AnimationEngine.spinnerAnimation(chatId, text, {
+  sendAnimatedMessage(chatId, text, {
     parse_mode: "HTML",
     reply_markup: {
       keyboard: [
         ["📊 Batafsil statistika", "📋 Buyurtmalar"],
         ["👥 Foydalanuvchilar", "📢 Xabar yuborish"],
-        ["🚫 Ban/Unban", "🗂️ Loglarni ko'rish"],
-        ["💰 Daromad hisoboti", "📈 Trading statistika"],
-        ["⚙️ Bot sozlamalar", "🔄 Botni qayta yuklash"],
+        ["🚫 Ban/Unban", "🗂️ Ma'lumotlar"],
         ["🔙 Bosh menyuga qaytish"]
       ],
       resize_keyboard: true,
     },
   });
-}
-
-function sendDetailedStats(chatId, userId) {
-  if (!isAdmin(userId)) return;
-
-  const memoryUsage = process.memoryUsage();
-  const uptime = process.uptime();
-  const totalUsers = Object.keys(userStats).length;
-  const totalOrders = orderHistory.length;
-  const activeUsers = Object.values(userStats).filter(user => 
-    moment().diff(moment(user.lastActive), 'hours') < 24
-  ).length;
-
-  const statsText = `📊 <b>Batafsil Statistika</b>
-
-🕒 <b>Server ma'lumotlari:</b>
-• Ish vaqti: ${Math.floor(uptime / 3600)}s ${Math.floor((uptime % 3600) / 60)}d
-• Xotira: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB
-• CPU: ${os.loadavg()[0].toFixed(2)}%
-
-👥 <b>Foydalanuvchilar:</b>
-• Jami: ${totalUsers}
-• Faol (24s): ${activeUsers}
-• Ban qilingan: ${bannedUsers.size}
-
-📦 <b>Buyurtmalar:</b>
-• Jami: ${totalOrders}
-• Bugun: ${orderHistory.filter(o => moment(o.timestamp).isSame(moment(), 'day')).length}
-• Bu hafta: ${orderHistory.filter(o => moment(o.timestamp).isSame(moment(), 'week')).length}
-
-💰 <b>Moliyaviy:</b>
-• Taxminiy daromad: ${totalOrders * 150000} so'm
-• O'rtacha buyurtma: 150,000 so'm
-
-📅 <b>Sana:</b> ${moment().format("DD.MM.YYYY HH:mm")}
-
-🔥 <i>Bot professional darajada ishlayapti!</i>`;
-
-  return AnimationEngine.typeWriter(chatId, statsText, { parse_mode: "HTML" });
 }
 
 // Price List Function
@@ -557,19 +355,19 @@ function sendPriceList(chatId) {
 💎 <i>Sifatli va arzon xizmatlar</i>
 
 `;
-
+  
   Object.entries(servicePrices).forEach(([category, services]) => {
     priceText += `\n<b>${category}</b>\n`;
     Object.entries(services).forEach(([service, price]) => {
       priceText += `• ${service}: ${price}\n`;
     });
   });
-
+  
   priceText += `\n💡 <i>Narxlar taxminiy bo'lib, loyiha murakkabligiga qarab o'zgarishi mumkin.</i>
 
 🎁 <b>Chegirmalar mavjud!</b>`;
-
-  AnimationEngine.spinnerAnimation(chatId, priceText, { parse_mode: "HTML" });
+  
+  sendAnimatedMessage(chatId, priceText, { parse_mode: "HTML" });
 }
 
 // Contact Information
@@ -578,18 +376,18 @@ function sendContactInfo(chatId) {
 
 🎯 <i>Har doim aloqada</i>
 
-👨‍💻 <b>Dasturchi:</b> @KXNexsus
-📧 <b>Email:</b> info@kxnexsus.uz
-📱 <b>Telefon:</b> +998 90 123 45 67
+👨‍💻 <b>Dasturchi:</b> @m_kimyonazarov
+📧 <b>Email:</b> coderkimyonazarov@gmail.com
+📱 <b>Telefon:</b> +998 77 404 13 56
 🌐 <b>Website:</b> https://kxnexsus.uz
 📺 <b>Kanal:</b> ${channelUsername}
 
 ⏰ <b>Ish vaqti:</b> 09:00 - 18:00 (Dushanba-Juma)
-📍 <b>Manzil:</b> Toshkent, Uzbekiston
+📍 <b>Manzil:</b> Farg'ona, Oltiariq
 
 💬 <i>Savollaringiz uchun doimo tayyormiz!</i>`;
 
-  AnimationEngine.spinnerAnimation(chatId, contactText, { parse_mode: "HTML" });
+  sendAnimatedMessage(chatId, contactText, { parse_mode: "HTML" });
 }
 
 // Error Handling
@@ -598,46 +396,40 @@ bot.on("polling_error", (error) => {
   logToFile(`Polling error: ${error.message}`);
 });
 
-bot.on("error", (error) => {
-  console.error("Bot error:", error);
-  logToFile(`Bot error: ${error.message}`);
-});
-
-// Delete webhook
+// Delete webhook to avoid conflicts
 bot.deleteWebHook().then(() => {
-  console.log("Webhook o'chirildi");
+  console.log("Webhook deleted successfully");
 }).catch((err) => {
-  console.log("Webhook yo'q yoki xato:", err.message);
+  console.log("No webhook to delete or error:", err.message);
 });
 
-// Set enhanced bot commands
+// Set bot commands
 const commands = [
   { command: "start", description: "🚀 Botni ishga tushirish" },
   { command: "menu", description: "🏠 Asosiy menyuni ochish" },
-  { command: "trading", description: "📈 Trading kurslari" },
   { command: "help", description: "❓ Yordam olish" },
   { command: "prices", description: "💰 Xizmat narxlari" },
   { command: "contact", description: "📞 Bog'lanish" },
   { command: "stats", description: "📊 Statistika" },
-  { command: "admin", description: "👨‍💼 Admin panel" }
 ];
 
 bot.setMyCommands(commands);
 
-// Enhanced Command Handlers
+// Command Handlers
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-
+  
   if (bannedUsers.has(userId)) {
     return bot.sendMessage(chatId, "🚫 Siz botdan foydalanish uchun ban qilingansiz.");
   }
 
   updateUserStats(userId);
 
+  // Ommaviy chatda boshqacha muomala
   if (isPublicChat(chatId)) {
     const publicWelcome = getPublicChatWelcome(msg.from.first_name);
-    return AnimationEngine.sendAnimatedMessage(chatId, publicWelcome, { 
+    return sendAnimatedMessage(chatId, publicWelcome, { 
       parse_mode: "HTML",
       reply_markup: {
         inline_keyboard: [[
@@ -679,21 +471,20 @@ bot.onText(/\/start/, async (msg) => {
 
   const welcomeText = `🎉 <b>Xush kelibsiz, ${msg.from.first_name}!</b>
 
-🚀 <i>Professional IT xizmatlar va Trading ta'limi olamiga xush kelibsiz!</i>
+🚀 <i>Professional IT xizmatlar olamiga xush kelibsiz!</i>
 
 🌟 <b>Bizning xizmatlar:</b>
 • 🌐 Zamonaviy web-saytlar
 • 🤖 Aqlli Telegram botlar  
 • 🔑 Domen va hosting
 • 📱 Mobile ilovalar
-• 📈 Trading o'quv kurslari
 • 🧤 Innovatsion loyihalar
 
 💫 <i>Sifat va ishonch kafolatlaymiz!</i>
 
 📞 <b>Savollar uchun:</b> @KXNexsus`;
 
-  await AnimationEngine.progressBar(chatId, welcomeText, { parse_mode: "HTML" });
+  await sendAnimatedMessage(chatId, welcomeText, { parse_mode: "HTML" });
   setTimeout(() => sendMainMenu(chatId), 2000);
 });
 
@@ -706,18 +497,16 @@ bot.onText(/\/menu|\/menyu/, (msg) => {
 bot.onText(/\/help/, (msg) => {
   const chatId = msg.chat.id;
   updateUserStats(msg.from.id);
-
+  
   const helpText = `🤖 <b>Yordam bo'limi</b>
 
 📋 <b>Mavjud buyruqlar:</b>
 /start - 🚀 Botni ishga tushirish
 /menu - 🏠 Asosiy menyuni ochish
-/trading - 📈 Trading kurslari
 /help - ❓ Ushbu yordam xabarini ko'rsatish
 /prices - 💰 Xizmat narxlarini ko'rish
 /contact - 📞 Bog'lanish ma'lumotlari
 /stats - 📊 Bot statistikasi
-/admin - 👨‍💼 Admin panel
 
 🛠️ <b>Qo'llab-quvvatlash:</b>
 📞 Telegram: @KXNexsus
@@ -726,7 +515,7 @@ bot.onText(/\/help/, (msg) => {
 
 💡 <i>Qo'shimcha yordam kerak bo'lsa, biz bilan bog'laning!</i>`;
 
-  AnimationEngine.spinnerAnimation(chatId, helpText, { parse_mode: "HTML" });
+  sendAnimatedMessage(chatId, helpText, { parse_mode: "HTML" });
 });
 
 bot.onText(/\/prices|\/narxlar/, (msg) => {
@@ -747,37 +536,26 @@ bot.onText(/\/stats|\/statistika/, (msg) => {
   sendStatistics(chatId);
 });
 
-bot.onText(/\/trading/, (msg) => {
-  const chatId = msg.chat.id;
-  updateUserStats(msg.from.id);
-  sendTradingMenu(chatId);
-});
-
-bot.onText(/\/admin/, (msg) => {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  updateUserStats(userId);
-  sendAdminPanel(chatId, userId);
-});
-
-// Enhanced Message Handler
+// Message Handler
 bot.on("message", async (msg) => {
   if (!msg.text || msg.text.startsWith("/")) return;
-
+  
   const chatId = msg.chat.id;
   const text = msg.text;
   const userId = msg.from.id;
-
+  
   if (bannedUsers.has(userId)) {
     return bot.sendMessage(chatId, "🚫 Siz botdan foydalanish uchun ban qilingansiz.");
   }
 
   updateUserStats(userId);
 
+  // Ommaviy chatda faqat muhim buyruqlarga javob berish
   if (isPublicChat(chatId)) {
-    const keywords = ['bot', 'sayt', 'dasturlash', 'xizmat', 'narx', 'buyurtma', 'loyiha', 'trading', 'kurs'];
+    // Faqat muayyan kalit so'zlarga javob berish
+    const keywords = ['bot', 'sayt', 'dasturlash', 'xizmat', 'narx', 'buyurtma', 'loyiha'];
     const hasKeyword = keywords.some(keyword => text.toLowerCase().includes(keyword));
-
+    
     if (hasKeyword || text.includes('@')) {
       return bot.sendMessage(chatId, `📞 <b>Buyurtma berish uchun:</b>
 
@@ -789,7 +567,7 @@ bot.on("message", async (msg) => {
         reply_to_message_id: msg.message_id
       });
     }
-    return;
+    return; // Ommaviy chatda boshqa xabarlarga javob bermaslik
   }
 
   // Handle subscription check
@@ -808,7 +586,7 @@ bot.on("message", async (msg) => {
     return;
   }
 
-  // Enhanced menu handlers
+  // Handle main menu keyboard buttons
   if (!userState[chatId] || userState[chatId].step === 0) {
     switch (text) {
       case "🌐 Web-sayt":
@@ -820,27 +598,6 @@ bot.on("message", async (msg) => {
       case "🤖 Bot xizmatlari":
         sendBotMenu(chatId);
         break;
-      case "📈 Trading kurslari":
-        sendTradingMenu(chatId);
-        break;
-      case "📚 Boshlang'ich kurs":
-        sendTradingCourseInfo(chatId, 'beginner');
-        break;
-      case "🎯 O'rta daraja":
-        sendTradingCourseInfo(chatId, 'intermediate');
-        break;
-      case "🚀 Professional kurs":
-        sendTradingCourseInfo(chatId, 'professional');
-        break;
-      case "👑 VIP Mentorlik":
-        sendTradingCourseInfo(chatId, 'vip');
-        break;
-      case "💼 Trading strategiyalar":
-        sendTradingStrategies(chatId);
-        break;
-      case "📊 Bozor tahlili":
-        sendMarketAnalysis(chatId);
-        break;
       case "🧤 Innovatsion loyiha":
         sendInnovationMenu(chatId);
         break;
@@ -849,7 +606,7 @@ bot.on("message", async (msg) => {
         break;
       case "📦 Buyurtma berish":
         userState[chatId] = { step: 1, serviceType: "default_buyurtma" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -860,8 +617,8 @@ bot.on("message", async (msg) => {
       case "👨‍💼 Admin panel":
         sendAdminPanel(chatId, userId);
         break;
-      case "📊 Batafsil statistika":
-        sendDetailedStats(chatId, userId);
+      case "📊 Statistika":
+        sendStatistics(chatId);
         break;
       case "ℹ️ Ma'lumotlar":
         const userInfo = `📁 <b>Sizning ma'lumotlaringiz:</b>
@@ -873,8 +630,8 @@ bot.on("message", async (msg) => {
 🌐 <b>Til:</b> ${msg.from.language_code || "Noma'lum"}
 
 🔒 <i>Ma'lumotlaringiz xavfsiz saqlanadi!</i>`;
-
-        AnimationEngine.spinnerAnimation(chatId, userInfo, { parse_mode: "HTML" });
+        
+        sendAnimatedMessage(chatId, userInfo, { parse_mode: "HTML" });
         break;
       case "📞 Bog'lanish":
         sendContactInfo(chatId);
@@ -895,7 +652,7 @@ bot.on("message", async (msg) => {
       // Website service handlers
       case "🆕 0 dan sayt":
         userState[chatId] = { step: 1, serviceType: "order_0dan" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -905,7 +662,7 @@ bot.on("message", async (msg) => {
         break;
       case "📋 Template dan sayt":
         userState[chatId] = { step: 1, serviceType: "order_template" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -915,7 +672,7 @@ bot.on("message", async (msg) => {
         break;
       case "🔄 Saytni yangilash":
         userState[chatId] = { step: 1, serviceType: "order_update" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -925,7 +682,7 @@ bot.on("message", async (msg) => {
         break;
       case "📄 Landing page":
         userState[chatId] = { step: 1, serviceType: "order_landing" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -935,7 +692,7 @@ bot.on("message", async (msg) => {
         break;
       case "🛒 E-commerce sayt":
         userState[chatId] = { step: 1, serviceType: "order_ecommerce" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -947,7 +704,7 @@ bot.on("message", async (msg) => {
       // Domain service handlers
       case "🌐 Domen (.com)":
         userState[chatId] = { step: 1, serviceType: "domain_com" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -957,7 +714,7 @@ bot.on("message", async (msg) => {
         break;
       case "🇺🇿 Domen (.uz)":
         userState[chatId] = { step: 1, serviceType: "domain_uz" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -967,7 +724,7 @@ bot.on("message", async (msg) => {
         break;
       case "💾 Hosting xizmati":
         userState[chatId] = { step: 1, serviceType: "hosting" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -977,7 +734,7 @@ bot.on("message", async (msg) => {
         break;
       case "🔒 SSL sertifikat":
         userState[chatId] = { step: 1, serviceType: "ssl" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -987,7 +744,7 @@ bot.on("message", async (msg) => {
         break;
       case "💿 Backup xizmati":
         userState[chatId] = { step: 1, serviceType: "backup" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -999,7 +756,7 @@ bot.on("message", async (msg) => {
       // Bot service handlers
       case "🔹 Oddiy bot":
         userState[chatId] = { step: 1, serviceType: "bot_simple" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -1009,7 +766,7 @@ bot.on("message", async (msg) => {
         break;
       case "🛒 E-commerce bot":
         userState[chatId] = { step: 1, serviceType: "bot_ecommerce" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -1019,7 +776,7 @@ bot.on("message", async (msg) => {
         break;
       case "📊 CRM bot":
         userState[chatId] = { step: 1, serviceType: "bot_crm" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -1029,7 +786,7 @@ bot.on("message", async (msg) => {
         break;
       case "⚡ Inline bot":
         userState[chatId] = { step: 1, serviceType: "bot_inline" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -1039,7 +796,7 @@ bot.on("message", async (msg) => {
         break;
       case "💳 Payment bot":
         userState[chatId] = { step: 1, serviceType: "bot_payment" };
-        AnimationEngine.typeWriter(chatId, "📝 <b>Ismingizni kiriting:</b>", {
+        sendAnimatedMessage(chatId, "📝 <b>Ismingizni kiriting:</b>", {
           parse_mode: "HTML",
           reply_markup: {
             keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -1172,7 +929,7 @@ Soqov insonlarning hayotini osonlashtirish va ularni jamiyatga yaxshiroq integra
     case 1:
       state.name = text;
       state.step = 2;
-      AnimationEngine.typeWriter(chatId, "📞 <b>Telefon raqamingizni kiriting:</b>", {
+      sendAnimatedMessage(chatId, "📞 <b>Telefon raqamingizni kiriting:</b>", {
         parse_mode: "HTML",
         reply_markup: {
           keyboard: [
@@ -1190,7 +947,7 @@ Soqov insonlarning hayotini osonlashtirish va ularni jamiyatga yaxshiroq integra
         state.phone = text;
       }
       state.step = 3;
-      AnimationEngine.typeWriter(chatId, "📝 <b>Loyiha haqida batafsil ma'lumot bering:</b>", {
+      sendAnimatedMessage(chatId, "📝 <b>Loyiha haqida batafsil ma'lumot bering:</b>", {
         parse_mode: "HTML",
         reply_markup: {
           keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -1201,7 +958,7 @@ Soqov insonlarning hayotini osonlashtirish va ularni jamiyatga yaxshiroq integra
     case 3:
       state.description = text;
       state.step = 4;
-      AnimationEngine.typeWriter(chatId, "💰 <b>Taxminiy byudjetingiz (so'mda):</b>", {
+      sendAnimatedMessage(chatId, "💰 <b>Taxminiy byudjetingiz (so'mda):</b>", {
         parse_mode: "HTML",
         reply_markup: {
           keyboard: [["🔙 Bosh menyuga qaytish"]],
@@ -1211,7 +968,7 @@ Soqov insonlarning hayotini osonlashtirish va ularni jamiyatga yaxshiroq integra
       break;
     case 4:
       state.budget = text;
-
+      
       const serviceName = {
         order_0dan: "0 dan sayt yaratish",
         order_template: "Template dan sayt",
@@ -1229,7 +986,6 @@ Soqov insonlarning hayotini osonlashtirish va ularni jamiyatga yaxshiroq integra
         bot_inline: "Inline bot",
         bot_payment: "Payment bot",
         default_buyurtma: "Umumiy buyurtma",
-        trading_course: "Trading kursi"
       }[state.serviceType] || "Umumiy buyurtma";
 
       const orderData = {
@@ -1242,7 +998,7 @@ Soqov insonlarning hayotini osonlashtirish va ularni jamiyatga yaxshiroq integra
         username: msg.from.username || "Yo'q",
         chatId: chatId
       };
-
+      
       const summary = `📥 <b>Yangi Buyurtma!</b>
 
 👤 <b>Ism:</b> ${state.name}
@@ -1256,12 +1012,12 @@ Soqov insonlarning hayotini osonlashtirish va ularni jamiyatga yaxshiroq integra
 
       orderHistory.push(orderData);
       saveOrderToFile(orderData);
-
+      
       if (userStats[userId]) {
         userStats[userId].orderCount++;
       }
 
-      AnimationEngine.spinnerAnimation(chatId, `✅ <b>Buyurtmangiz qabul qilindi!</b>
+      sendAnimatedMessage(chatId, `✅ <b>Buyurtmangiz qabul qilindi!</b>
 
 🎉 <i>Rahmat! Sizning buyurtmangiz muvaffaqiyatli ro'yxatga olindi.</i>
 
@@ -1273,7 +1029,7 @@ Bizning mutaxassislar 1-2 soat ichida siz bilan bog'lanishadi.
 💼 <b>Buyurtma raqami:</b> #${orderHistory.length}`, {
         parse_mode: "HTML"
       });
-
+      
       bot.sendMessage(adminChatId, summary, {
         parse_mode: "HTML",
         reply_markup: {
@@ -1291,7 +1047,7 @@ Bizning mutaxassislar 1-2 soat ichida siz bilan bog'lanishadi.
   }
 });
 
-// Express Routes with enhanced styling
+// Express Routes
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -1299,77 +1055,23 @@ app.get("/", (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-        <title>🤖 Professional Trading Bot</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>🤖 Telegram Bot</title>
         <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                color: white; 
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .container { 
-                background: rgba(255,255,255,0.1); 
-                padding: 40px; 
-                border-radius: 20px; 
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255,255,255,0.2);
-                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                text-align: center;
-                max-width: 600px;
-                width: 90%;
-            }
-            h1 { 
-                margin-bottom: 30px; 
-                font-size: 2.5em;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            }
-            .status { 
-                font-size: 1.5em; 
-                margin: 20px 0; 
-                padding: 15px;
-                background: rgba(255,255,255,0.1);
-                border-radius: 10px;
-            }
-            .info { 
-                margin: 15px 0; 
-                font-size: 1.2em; 
-                padding: 10px;
-                background: rgba(255,255,255,0.05);
-                border-radius: 8px;
-                border-left: 4px solid #fff;
-            }
-            .grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
-                margin-top: 20px;
-            }
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-                100% { transform: scale(1); }
-            }
-            .status { animation: pulse 2s infinite; }
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+            .container { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 0 auto; max-width: 500px; }
+            h1 { margin-bottom: 20px; }
+            .status { font-size: 24px; margin: 20px 0; }
+            .info { margin: 10px 0; font-size: 18px; }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>🤖 Professional Trading Bot</h1>
+            <h1>🤖 Professional IT Bot</h1>
             <div class="status">✅ Bot aktiv ishlayapti!</div>
-            <div class="grid">
-                <div class="info">⏰ Server vaqti<br>${moment().format("DD.MM.YYYY HH:mm:ss")}</div>
-                <div class="info">🚀 Uptime<br>${Math.floor(process.uptime() / 3600)}s ${Math.floor((process.uptime() % 3600) / 60)}d</div>
-                <div class="info">👥 Foydalanuvchilar<br>${Object.keys(userStats).length}</div>
-                <div class="info">📦 Buyurtmalar<br>${orderHistory.length}</div>
-                <div class="info">💾 Xotira<br>${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB</div>
-                <div class="info">🌐 Port<br>${PORT}</div>
-            </div>
+            <div class="info">⏰ Server vaqti: ${moment().format("DD.MM.YYYY HH:mm:ss")}</div>
+            <div class="info">🚀 Uptime: ${Math.floor(process.uptime())} soniya</div>
+            <div class="info">👥 Foydalanuvchilar: ${Object.keys(userStats).length}</div>
+            <div class="info">📦 Buyurtmalar: ${orderHistory.length}</div>
         </div>
     </body>
     </html>
@@ -1383,24 +1085,23 @@ app.get("/stats", (req, res) => {
     uptime: process.uptime(),
     memory: process.memoryUsage(),
     timestamp: moment().format("YYYY-MM-DD HH:mm:ss"),
-    status: "active",
-    version: "2.0.0",
-    features: ["IT Services", "Trading Courses", "Admin Panel", "Enhanced Animations"]
+    status: "active"
   };
   res.json(stats);
 });
 
-// Start server
+// Start Express Server
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Server ${PORT}-portda ishlamoqda`);
+  console.log(`✅ Express server ${PORT}-portda ishlayapti`);
   logToFile(`Server started on port ${PORT}`);
 });
 
-console.log("🤖 Professional Trading Bot ishga tushdi!");
-logToFile("Bot started successfully with enhanced features");
+// Log bot start
+console.log("🤖 Telegram bot ishga tushdi!");
+logToFile("Bot started successfully");
 
-// Memory monitoring
+// Log memory usage every hour
 setInterval(() => {
   const memUsage = process.memoryUsage();
-  logToFile(`Memory: ${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+  logToFile(`Memory usage: ${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
 }, 3600000);
